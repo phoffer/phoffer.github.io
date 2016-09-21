@@ -1,4 +1,28 @@
-<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" version="2.0"><channel><title>The Daily Planet</title><description>Coding the impossible</description><link>http://localhost:2368/</link><generator>Ghost 0.7</generator><lastBuildDate>Sun, 10 Jul 2016 00:51:43 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title>Smoothly upgrade did_you_mean gem for Ruby 2.3</title><description>&lt;p&gt;A lot of Rails apps are using the gem &lt;a href="https://github.com/yuki24/did_you_mean"&gt;&lt;code&gt;did_you_mean&lt;/code&gt;&lt;/a&gt; to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core. &lt;/p&gt;
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" version="2.0"><channel><title>The Daily Planet</title><description>Coding the impossible</description><link>http://localhost:2368/</link><generator>Ghost 0.7</generator><lastBuildDate>Wed, 21 Sep 2016 14:29:40 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title>Force git to treat Keynote files as binary instead of a directory</title><description>&lt;p&gt;I was recently putting together a repo for presentations I've given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-bash"&gt;$ git status
+...
+    new file:   2016_06_07-URUG copy.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg
+    new file:   2016_06_&lt;/code&gt;&lt;/pre&gt;</description><link>http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/</link><guid isPermaLink="false">d95c6126-eff2-4056-9ae3-f485a2afe12d</guid><category>osx</category><dc:creator>Paul Hoffer</dc:creator><pubDate>Wed, 21 Sep 2016 13:57:42 GMT</pubDate><content:encoded>&lt;p&gt;I was recently putting together a repo for presentations I've given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="language-bash"&gt;$ git status
+...
+    new file:   2016_06_07-URUG copy.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg
+    new file:   2016_06_07-URUG copy.key/Data/st-FA2A3A03-7617-4164-9E65-1304161A58D5-2058.jpg
+    new file:   2016_06_07-URUG copy.key/Metadata/BuildVersionHistory.plist
+    new file:   2016_06_07-URUG copy.key/Metadata/DocumentIdentifier
+    new file:   2016_06_07-URUG copy.key/Metadata/Properties.plist
+    new file:   2016_06_07-URUG copy.key/preview-micro.jpg
+    new file:   2016_06_07-URUG copy.key/preview-web.jpg
+    new file:   2016_06_07-URUG copy.key/preview.jpg
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I just want the files there as binary, so that anyone can download them if they like.&lt;/p&gt;
+
+&lt;p&gt;I tried a few different things, including a &lt;code&gt;.gitattributes&lt;/code&gt; file with &lt;code&gt;*.key binary&lt;/code&gt;, using different versions of git, and even different versions of OS X (el Capitan and Sierra).&lt;/p&gt;
+
+&lt;p&gt;In the end, the problem was from when I had saved the presentations. The &lt;code&gt;hide file extension&lt;/code&gt; option in Keynote's save dialog was the problem. De-selecting that option is all it took for it to work as I wanted (and as I think most people would expect).&lt;/p&gt;</content:encoded></item><item><title>Smoothly upgrade did_you_mean gem for Ruby 2.3</title><description>&lt;p&gt;A lot of Rails apps are using the gem &lt;a href="https://github.com/yuki24/did_you_mean"&gt;&lt;code&gt;did_you_mean&lt;/code&gt;&lt;/a&gt; to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core. &lt;/p&gt;
 
 &lt;p&gt;A graceful method of upgrading Ruby is to update&lt;/p&gt;</description><link>http://localhost:2368/gracefully-dropping-did_you_mean-gem-for-ruby-2-3/</link><guid isPermaLink="false">7b747ede-3eb5-4eb3-bd99-9c4b44478d17</guid><category>ruby</category><dc:creator>Paul Hoffer</dc:creator><pubDate>Sat, 05 Mar 2016 00:40:35 GMT</pubDate><content:encoded>&lt;p&gt;A lot of Rails apps are using the gem &lt;a href="https://github.com/yuki24/did_you_mean"&gt;&lt;code&gt;did_you_mean&lt;/code&gt;&lt;/a&gt; to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core. &lt;/p&gt;
 

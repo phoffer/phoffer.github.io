@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="utf-8">
         <meta name="author" content="">
-        <title>Getting Ghost onto Github Pages</title>
+        <title>Force git to treat Keynote files as binary instead of a directory</title>
         <meta name="description" content="">
         <meta name="theme-color" content="#263238">
         <link rel="stylesheet" type="text/css" href="../assets/css/animate.min.css?v=4f9c60bcf1">
@@ -32,15 +32,17 @@
     
     <meta property="og:site_name" content="The Daily Planet">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Getting Ghost onto Github Pages">
-    <meta property="og:description" content="Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn't maintained anymore and it fails to generate the static version of an basic Ghost blog. Let's assume that you have a Ghost blog working locally already, and now you're">
-    <meta property="og:url" content="http://localhost:2368/getting-ghost-onto-github-pages/">
-    <meta property="article:published_time" content="2016-02-21T05:40:19.103Z">
-    <meta property="article:modified_time" content="2016-06-02T21:21:19.863Z">
+    <meta property="og:title" content="Force git to treat Keynote files as binary instead of a directory">
+    <meta property="og:description" content="I was recently putting together a repo for presentations I've given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this: $ git status ...     new file:   2016_06_07-URUG copy.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg     new file:   2016_06_">
+    <meta property="og:url" content="http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/">
+    <meta property="article:published_time" content="2016-09-21T13:57:42.156Z">
+    <meta property="article:modified_time" content="2016-09-21T14:00:27.690Z">
+    <meta property="article:tag" content="osx">
+    
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Getting Ghost onto Github Pages">
-    <meta name="twitter:description" content="Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn't maintained anymore and it fails to generate the static version of an basic Ghost blog. Let's assume that you have a Ghost blog working locally already, and now you're">
-    <meta name="twitter:url" content="http://localhost:2368/getting-ghost-onto-github-pages/">
+    <meta name="twitter:title" content="Force git to treat Keynote files as binary instead of a directory">
+    <meta name="twitter:description" content="I was recently putting together a repo for presentations I've given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this: $ git status ...     new file:   2016_06_07-URUG copy.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg     new file:   2016_06_">
+    <meta name="twitter:url" content="http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/">
     
     <script type="application/ld+json">
 {
@@ -53,11 +55,12 @@
         "image": "//www.gravatar.com/avatar/a827ead5140db3c911a74053fbf8f51a?s=250&d=mm&r=x",
         "url": "http://localhost:2368/author/paul/"
     },
-    "headline": "Getting Ghost onto Github Pages",
-    "url": "http://localhost:2368/getting-ghost-onto-github-pages/",
-    "datePublished": "2016-02-21T05:40:19.103Z",
-    "dateModified": "2016-06-02T21:21:19.863Z",
-    "description": "Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn&#x27;t maintained anymore and it fails to generate the static version of an basic Ghost blog. Let&#x27;s assume that you have a Ghost blog working locally already, and now you&#x27;re"
+    "headline": "Force git to treat Keynote files as binary instead of a directory",
+    "url": "http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/",
+    "datePublished": "2016-09-21T13:57:42.156Z",
+    "dateModified": "2016-09-21T14:00:27.690Z",
+    "keywords": "osx",
+    "description": "I was recently putting together a repo for presentations I&#x27;ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this: $ git status ...     new file:   2016_06_07-URUG copy.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg     new file:   2016_06_"
 }
     </script>
 
@@ -86,7 +89,7 @@ ghost.init({
     </head>
 
 
-    <body class="post-template">
+    <body class="post-template tag-osx">
         <div class="navmenu navmenu-default navmenu-fixed-left offcanvas-sm">
             <div class="nav-wrapper container">
                 <div class="animated fadeInLeft">
@@ -158,37 +161,48 @@ ghost.init({
                                         <div class="post-header">
                                             <div class="front-post-meta">
     <div class="front-post-tag">
+            <i class="fa fa-hashtag" aria-hidden="true"></i>
+            <a href="../tag/osx/" title="osx">osx</a>
     </div>
-    <time class="front-post-date" datetime="2016-02-20">
+    <time class="front-post-date" datetime="2016-09-21">
         <i class="fa fa-clock-o" aria-hidden="true"></i>
-        2016-02-20
+        2016-09-21
     </time>
 </div>                                        </div>
                                         <div class="post-p">
-                                            <p>Ghost seems great. Github Pages seem great. Getting those two together <a href="http://blog.sunnyg.io/2015/09/24/ghost-with-github/">seems</a> <a href="http://carlbernardo.github.io/setting-up-your-ghost-github-pages-blog/">so</a> <a href="http://briank.im/i-see-ghosts/">incredibly</a> <a href="http://www.willhackett.com/2015/11/13/slightly-late-halloween-post-how-to-host-ghost-on-github/">simple</a>. Oh but guess what, Buster isn't maintained anymore and it <a href="https://github.com/axitkhurana/buster/issues/43">fails to generate the static version</a> of an basic Ghost blog.</p>
+                                            <p>I was recently putting together a repo for presentations I've given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:</p>
 
-<p>Let's assume that you have a Ghost blog working locally already, and now you're just trying to deploy to GH pages.</p>
-
-<p>There's a <a href="https://github.com/thinkamabob/buster">fork of Buster</a> that fixes this problem. Install Buster from that fork (use the <code>--update</code> flag if you already have Buster installed):</p>
-
-<pre><code class="language-bash">pip install https://github.com/thinkamabob/buster/archive/master.zip --upgrade  
-buster generate --domain=http://localhost:2368/  
+<pre><code class="language-bash">$ git status
+...
+    new file:   2016_06_07-URUG copy.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg
+    new file:   2016_06_07-URUG copy.key/Data/st-FA2A3A03-7617-4164-9E65-1304161A58D5-2058.jpg
+    new file:   2016_06_07-URUG copy.key/Metadata/BuildVersionHistory.plist
+    new file:   2016_06_07-URUG copy.key/Metadata/DocumentIdentifier
+    new file:   2016_06_07-URUG copy.key/Metadata/Properties.plist
+    new file:   2016_06_07-URUG copy.key/preview-micro.jpg
+    new file:   2016_06_07-URUG copy.key/preview-web.jpg
+    new file:   2016_06_07-URUG copy.key/preview.jpg
+...
 </code></pre>
 
-<p>Now you can host your blog on Github Pages. Congratulations!</p>
+<p>I just want the files there as binary, so that anyone can download them if they like.</p>
+
+<p>I tried a few different things, including a <code>.gitattributes</code> file with <code>*.key binary</code>, using different versions of git, and even different versions of OS X (el Capitan and Sierra).</p>
+
+<p>In the end, the problem was from when I had saved the presentations. The <code>hide file extension</code> option in Keynote's save dialog was the problem. De-selecting that option is all it took for it to work as I wanted (and as I think most people would expect).</p>
                                         </div>
                                         <hr>
                                         <div class="post-share btn-group-sm">
                                             <h3><i class="material-icons">share</i> Share this:</h3>
-                                            <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:2368/getting-ghost-onto-github-pages/" class="btn btn-default btn-fab fb intent" data-width="580" height="235">
+                                            <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/" class="btn btn-default btn-fab fb intent" data-width="580" height="235">
                                                 <i class="fa fa-facebook" aria-hidden="true"></i>
                                                 <div class="ripple-container"></div>
                                             </a>
-                                            <a href="https://twitter.com/intent/tweet?text=Getting%20Ghost%20onto%20Github%20Pages&amp;url=http://localhost:2368/getting-ghost-onto-github-pages/" class="btn btn-default btn-fab tw intent" data-width="550" data-height="235">
+                                            <a href="https://twitter.com/intent/tweet?text=Force%20git%20to%20treat%20Keynote%20files%20as%20binary%20instead%20of%20a%20directory&amp;url=http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/" class="btn btn-default btn-fab tw intent" data-width="550" data-height="235">
                                                 <i class="fa fa-twitter" aria-hidden="true"></i>
                                                 <div class="ripple-container"></div>
                                             </a>
-                                            <a href="https://plus.google.com/share?url=http://localhost:2368/getting-ghost-onto-github-pages/" class="btn btn-default btn-fab gp intent" data-width="590" data-height="530">
+                                            <a href="https://plus.google.com/share?url=http://localhost:2368/force-git-to-treat-keynote-files-as-binary-instead-of-a-directory/" class="btn btn-default btn-fab gp intent" data-width="590" data-height="530">
                                                 <i class="fa fa-google-plus" aria-hidden="true"></i>
                                                 <div class="ripple-container"></div>
                                             </a>
@@ -204,12 +218,13 @@ buster generate --domain=http://localhost:2368/
                 
 <div class="row post-navigation">
                 <div class="col-md-10 col-md-offset-1 btn-group-sm">
-                    <a href="../gracefully-dropping-did_you_mean-gem-for-ruby-2-3/" class="left">
+
+                    <a href="../gracefully-dropping-did_you_mean-gem-for-ruby-2-3/" class="right">
+                          Older
                         <button class="btn btn-primary btn-fab">
-                            <i class="material-icons">arrow_back</i>
+                            <i class="material-icons">arrow_forward</i>
                         </button>
-                          Newer                    </a>
-                    
+                    </a>
                 </div>
             </div>
         </div>
