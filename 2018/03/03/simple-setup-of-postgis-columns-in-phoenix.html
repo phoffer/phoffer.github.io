@@ -1,0 +1,575 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.10.0 by Michael Rose
+  Copyright 2013-2018 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Simple Setup of PostGIS Columns in Phoenix  Paul’s Blog</title>
+<meta name="description" content="The docs for geo_postgis are sufficient for figuring out how to use it, but not very helpful for making it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a Point column in a recent project.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Paul's Blog">
+<meta property="og:title" content="Simple Setup of PostGIS Columns in Phoenix">
+<meta property="og:url" content="https://code.phoffer.com/2018/03/03/simple-setup-of-postgis-columns-in-phoenix.html">
+
+
+  <meta property="og:description" content="The docs for geo_postgis are sufficient for figuring out how to use it, but not very helpful for making it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a Point column in a recent project.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2018-03-03T00:00:00-07:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://code.phoffer.com/2018/03/03/simple-setup-of-postgis-columns-in-phoenix.html">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="https://code.phoffer.com/feed.xml" type="application/atom+xml" rel="alternate" title="Paul's Blog Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://code.phoffer.com/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="https://code.phoffer.com/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Paul Hoffer</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects. I occasionally run and golf in my spare time.
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/phoffer8" itemprop="sameAs">
+            <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs">
+            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/phoffer" itemprop="sameAs">
+            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs">
+            <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i> Stack Overflow
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Simple Setup of PostGIS Columns in Phoenix">
+    <meta itemprop="description" content="The docs for geo_postgis are sufficient for figuring out how to use it, but not very helpful for making it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a Point column in a recent project.">
+    <meta itemprop="datePublished" content="March 03, 2018">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Simple Setup of PostGIS Columns in Phoenix
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  5 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>The docs for <a href="https://github.com/bryanjos/geo_postgis">geo_postgis</a> are sufficient for figuring out how to use it, but not very helpful for making it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a <code class="highlighter-rouge">Point</code> column in a recent project.</p>
+
+<p><strong>Goal:</strong> Use Phoenix generators (since Contexts are too useful to ignore), and have the generated changesets, views, and tests work with only minor tweaks.</p>
+
+<ol>
+  <li>
+    <p>First step is to plan out what type of data you will have, and what primitives it is composed of.</p>
+
+    <p>In this case, a <code class="highlighter-rouge">Point</code> has 2 floats, representing latitude and longitude. Most interaction will be with the float values instead of the <code class="highlighter-rouge">Geo.Point</code> struct. These 2 floats will eventually become virtual attributes to our schema struct.</p>
+  </li>
+  <li>
+    <p>Use the virtual attributes in our generator.</p>
+
+    <p>For an <code class="highlighter-rouge">Map</code> context and a <code class="highlighter-rouge">locations</code> table, our generator command will look like this:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mix phx.gen.html Map Location locations lng:float lat:float <span class="c"># ... other columns</span>
+</code></pre></div>    </div>
+
+    <p>There are still a few steps before this works and tests are passing. The migration, schema, and tests need updating.</p>
+  </li>
+  <li>
+    <p>Fix the migration to create the proper column (<code class="highlighter-rouge">coordinates</code>).</p>
+
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Repo</span><span class="o">.</span><span class="no">Migrations</span><span class="o">.</span><span class="no">CreateLocations</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Migration</span>
+
+  <span class="k">def</span> <span class="n">change</span> <span class="k">do</span>
+    <span class="n">create</span> <span class="n">table</span><span class="p">(</span><span class="ss">:locations</span><span class="p">)</span> <span class="k">do</span>
+      <span class="c1"># remove the lines for lat/lng</span>
+      <span class="c1"># add :lat, :float</span>
+      <span class="c1"># add :lng, :float</span>
+    <span class="k">end</span>
+
+<span class="c1"># add the next line, which creates a column `coordinates` on table `locations`</span>
+    <span class="n">execute</span><span class="p">(</span><span class="sd">"</span><span class="s2">SELECT AddGeometryColumn ('locations','coordinates',4326,'POINT',2);"</span><span class="p">)</span>
+<span class="c1"># add an index if necessary</span>
+    <span class="n">create</span> <span class="n">index</span><span class="p">(</span><span class="ss">:locations</span><span class="p">,</span> <span class="p">[</span><span class="ss">:coordinates</span><span class="p">],</span> <span class="ss">using:</span> <span class="ss">:gist</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Update the generated schema:</p>
+
+    <p>Find <code class="highlighter-rouge">lib/my_app/map/locations.ex</code> to make the <code class="highlighter-rouge">lat</code>/<code class="highlighter-rouge">lng</code> columns virtual, add the <code class="highlighter-rouge">coordinates</code> column, and cast <code class="highlighter-rouge">lat</code>/<code class="highlighter-rouge">lng</code> to <code class="highlighter-rouge">coordinates</code></p>
+
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Map</span><span class="o">.</span><span class="no">Location</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Schema</span>
+  <span class="kn">import</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span>
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Map</span><span class="o">.</span><span class="no">Location</span>
+
+  <span class="n">schema</span> <span class="sd">"</span><span class="s2">locations"</span> <span class="k">do</span>
+    <span class="n">field</span> <span class="ss">:coordinates</span><span class="p">,</span> <span class="no">Geo</span><span class="o">.</span><span class="no">Point</span>     <span class="c1"># add the actual column</span>
+    <span class="n">field</span> <span class="ss">:lng</span><span class="p">,</span> <span class="ss">:float</span><span class="p">,</span> <span class="ss">virtual:</span> <span class="no">true</span> <span class="c1"># add the virtual flag here and below</span>
+    <span class="n">field</span> <span class="ss">:lat</span><span class="p">,</span> <span class="ss">:float</span><span class="p">,</span> <span class="ss">virtual:</span> <span class="no">true</span>
+  <span class="k">end</span>
+
+  <span class="nv">@doc</span> <span class="no">false</span>
+  <span class="k">def</span> <span class="n">changeset</span><span class="p">(%</span><span class="no">Location</span><span class="p">{}</span> <span class="o">=</span> <span class="n">location</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">location</span>
+    <span class="o">|&gt;</span> <span class="n">cast</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="p">[</span><span class="ss">:lng</span><span class="p">,</span> <span class="ss">:lat</span><span class="p">])</span>
+    <span class="o">|&gt;</span> <span class="n">validate_required</span><span class="p">([</span><span class="ss">:lng</span><span class="p">,</span> <span class="ss">:lat</span><span class="p">])</span>
+    <span class="o">|&gt;</span> <span class="n">cast_coordinates</span><span class="p">()</span>        <span class="c1"># remember to cast the coordinates!</span>
+  <span class="k">end</span>
+
+  <span class="c1"># something like this to cast the virtual columns to actual column</span>
+  <span class="c1"># it would be good to add validation but I've left it out for brevity</span>
+  <span class="k">def</span> <span class="n">cast_coordinates</span><span class="p">(</span><span class="n">changeset</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">get_change</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="ss">:lat</span><span class="p">)</span>
+    <span class="n">lng</span> <span class="o">=</span> <span class="n">get_change</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="ss">:lng</span><span class="p">)</span>
+    <span class="n">geo</span> <span class="o">=</span> <span class="p">%</span><span class="no">Geo</span><span class="o">.</span><span class="no">Point</span><span class="p">{</span><span class="ss">coordinates:</span> <span class="p">{</span><span class="n">lng</span><span class="p">,</span> <span class="n">lat</span><span class="p">},</span> <span class="ss">srid:</span> <span class="m">4326</span><span class="p">}</span>
+    <span class="n">changeset</span> <span class="o">|&gt;</span> <span class="n">put_change</span><span class="p">(</span><span class="ss">:coordinates</span><span class="p">,</span> <span class="n">geo</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Update the generated tests:</p>
+
+    <p>Find <code class="highlighter-rouge">test/my_app/map/map_test.exs</code> and <code class="highlighter-rouge">test/my_app/controllers/location_controller_test.exs</code>, in order to add a check for th actual geo column.</p>
+
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/controllers/location_controller_test.exs</span>
+   
+<span class="k">defmodule</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">LocationControllerTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">ConnCase</span>
+   
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Map</span>
+   
+  <span class="nv">@create_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="m">60.5</span><span class="p">,</span> <span class="ss">lng:</span> <span class="m">70.5</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+  <span class="nv">@update_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="m">45.7</span><span class="p">,</span> <span class="ss">lng:</span> <span class="m">56.7</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+  <span class="nv">@invalid_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="m">200</span><span class="p">,</span> <span class="ss">lng:</span> <span class="m">200</span><span class="p">}</span>  <span class="c1"># use invalid values here</span>
+   
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/map/map_test.exs</span>
+   
+<span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">MapTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">DataCase</span>
+   
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Map</span>
+   
+  <span class="n">describe</span> <span class="sd">"</span><span class="s2">locations"</span> <span class="k">do</span>
+    <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Map</span><span class="o">.</span><span class="no">Location</span>
+   
+    <span class="nv">@create_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="m">60.5</span><span class="p">,</span> <span class="ss">lng:</span> <span class="m">70.5</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+    <span class="nv">@update_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="m">45.7</span><span class="p">,</span> <span class="ss">lng:</span> <span class="m">56.7</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+    <span class="nv">@invalid_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="m">200</span><span class="p">,</span> <span class="ss">lng:</span> <span class="m">200</span><span class="p">}</span>  <span class="c1"># use invalid values here</span>
+   
+  <span class="c1"># any test checking equality will need to reset the lat/lng attributes</span>
+    <span class="n">test</span> <span class="sd">"</span><span class="s2">list_locations/0 returns all locations"</span> <span class="k">do</span>
+      <span class="n">location</span> <span class="o">=</span> <span class="p">%{</span> <span class="n">location_fixture</span><span class="p">()</span> <span class="o">|</span> <span class="ss">lat:</span> <span class="no">nil</span><span class="p">,</span> <span class="ss">lng:</span> <span class="no">nil</span><span class="p">}</span>
+      <span class="n">assert</span> <span class="no">Map</span><span class="o">.</span><span class="n">list_locations</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">location</span><span class="p">]</span>
+    <span class="k">end</span>
+   
+  <span class="c1"># for tests checking values, remove the assertions for lat/lng and add one for `coordinates`</span>
+    <span class="n">test</span> <span class="sd">"</span><span class="s2">create_location/1 with valid data creates a location"</span> <span class="k">do</span>
+      <span class="n">assert</span> <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="p">%</span><span class="no">Location</span><span class="p">{}</span> <span class="o">=</span> <span class="n">location</span><span class="p">}</span> <span class="o">=</span> <span class="no">Map</span><span class="o">.</span><span class="n">create_location</span><span class="p">(</span><span class="nv">@valid_attrs</span><span class="p">)</span>
+      <span class="c1"># assert location.lat == 60.5</span>
+      <span class="c1"># assert location.lng == 70.5</span>
+      <span class="n">assert</span> <span class="n">location</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">==</span> <span class="p">%</span><span class="no">Geo</span><span class="o">.</span><span class="no">Point</span><span class="p">{</span><span class="ss">coordinates:</span> <span class="p">{</span><span class="m">70.5</span><span class="p">,</span> <span class="m">60.5</span><span class="p">},</span> <span class="ss">srid:</span> <span class="m">4326</span><span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Run tests. Everything should be passing!</strong></p>
+
+    <p>Now go celebrate by adding some real functionality!</p>
+  </li>
+</ol>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://code.phoffer.com/tags/ecto" class="page__taxonomy-item" style="color: #fff; background-color: #74B54B;" rel="tag">ecto</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://code.phoffer.com/tags/elixir" class="page__taxonomy-item" style="color: #fff; background-color: #6e4a7e;" rel="tag">elixir</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://code.phoffer.com/tags/postgis" class="page__taxonomy-item" style="color: #fff; background-color: #6C89AB;" rel="tag">postgis</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2018-03-03T00:00:00-07:00">March 03, 2018</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Simple+Setup+of+PostGIS+Columns+in+Phoenix%20https%3A%2F%2Fcode.phoffer.com%2F2018%2F03%2F03%2Fsimple-setup-of-postgis-columns-in-phoenix.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcode.phoffer.com%2F2018%2F03%2F03%2Fsimple-setup-of-postgis-columns-in-phoenix.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fcode.phoffer.com%2F2018%2F03%2F03%2Fsimple-setup-of-postgis-columns-in-phoenix.html" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fcode.phoffer.com%2F2018%2F03%2F03%2Fsimple-setup-of-postgis-columns-in-phoenix.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://code.phoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" class="pagination--pager" title="Force git to treat Keynote files as binary
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://code.phoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="permalink">Force git to treat Keynote files as binary
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directo...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://code.phoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="permalink">Smoothly upgrade did_you_mean gem for Ruby 2.3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to R...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://code.phoffer.com/2016/02/20/getting-ghost-onto-github-pages.html" rel="permalink">Getting Ghost onto Github Pages
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it ...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><input type="text" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+    <div id="results" class="results"></div></div>
+      </div>
+    
+
+    
+
+    
+  <script src="https://code.phoffer.com/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+
+
+
+<script src="https://code.phoffer.com/assets/js/lunr/lunr.min.js"></script>
+<script src="https://code.phoffer.com/assets/js/lunr/lunr-store.js"></script>
+<script src="https://code.phoffer.com/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+  </body>
+</html>

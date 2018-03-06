@@ -13,6 +13,10 @@
 <lastmod>2016-09-21T00:00:00-06:00</lastmod>
 </url>
 <url>
+<loc>https://code.phoffer.com/2018/03/03/simple-setup-of-postgis-columns-in-phoenix.html</loc>
+<lastmod>2018-03-03T00:00:00-07:00</lastmod>
+</url>
+<url>
 <loc>https://code.phoffer.com/about/</loc>
 </url>
 <url>
@@ -23,5 +27,14 @@
 </url>
 <url>
 <loc>https://code.phoffer.com/tags/osx/</loc>
+</url>
+<url>
+<loc>https://code.phoffer.com/tags/elixir/</loc>
+</url>
+<url>
+<loc>https://code.phoffer.com/tags/ecto/</loc>
+</url>
+<url>
+<loc>https://code.phoffer.com/tags/postgis/</loc>
 </url>
 </urlset>
