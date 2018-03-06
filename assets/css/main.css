@@ -24,7 +24,10 @@ pre.highlight {
   height: 100vh !important;
   margin-left: -1em !important;
   padding-left: 1em !important;
-  padding-right: 1em; }
+  padding-right: 1em;
+  margin-bottom: -1em !important;
+  top: 0 !important;
+  bottom: 0 !important; }
   .sidebar.sticky .author__name {
     font-size: 1.2em !important; }
   .sidebar.sticky .author__bio {
