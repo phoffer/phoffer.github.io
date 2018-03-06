@@ -9,16 +9,19 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin _includes/seo.html --><title>Paul's Blog</title>
-<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+<!-- begin _includes/seo.html --><title>Getting Ghost onto Github Pages  Paul’s Blog</title>
+<meta name="description" content="Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it   fails to generate the static version of an basic Ghost blog.">
 
 
 
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="Paul's Blog">
-<meta property="og:title" content="Paul’s Blog">
-<meta property="og:url" content="https://code.phoffer.com/">
+<meta property="og:title" content="Getting Ghost onto Github Pages">
+<meta property="og:url" content="https://code.phoffer.com/2016/02/20/getting-ghost-onto-github-pages.html">
+
+
+  <meta property="og:description" content="Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it   fails to generate the static version of an basic Ghost blog.">
 
 
 
@@ -26,13 +29,14 @@
 
 
 
+  <meta property="article:published_time" content="2016-02-20T00:00:00-07:00">
 
 
 
 
 
 
-<link rel="canonical" href="https://code.phoffer.com/">
+<link rel="canonical" href="https://code.phoffer.com/2016/02/20/getting-ghost-onto-github-pages.html">
 
 
 
@@ -87,7 +91,7 @@
 
   </head>
 
-  <body class="layout--archive">
+  <body class="layout--single">
 
     <!--[if lt IE 9]>
 <div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
@@ -224,13 +228,97 @@
   </div>
 
 
-  <div class="archive">
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Getting Ghost onto Github Pages">
+    <meta itemprop="description" content="Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it   fails to generate the static version of an basic Ghost blog.">
+    <meta itemprop="datePublished" content="February 20, 2016">
     
-      <h1 class="page__title"></h1>
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Getting Ghost onto Github Pages
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Ghost seems great. Github Pages seem great. Getting those two together <a href="http://blog.sunnyg.io/2015/09/24/ghost-with-github/">seems</a> <a href="http://carlbernardo.github.io/setting-up-your-ghost-github-pages-blog/">so</a> <a href="http://briank.im/i-see-ghosts/">incredibly</a> <a href="http://www.willhackett.com/2015/11/13/slightly-late-halloween-post-how-to-host-ghost-on-github/">simple</a>. Oh but guess what, Buster isn’t maintained anymore and it 
+  <a href="https://github.com/axitkhurana/buster/issues/43">fails to generate the static version</a> of an basic Ghost blog.</p>
+
+<p>Let’s assume that you have a Ghost blog working locally already, and now you’re just trying to deploy to GH pages.</p>
+
+<p>There’s a fork of Buster that fixes this problem. Install Buster from that fork (use the –update flag if you already have Buster installed):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip <span class="nb">install </span>https://github.com/thinkamabob/buster/archive/master.zip <span class="nt">--upgrade</span>  
+buster generate <span class="nt">--domain</span><span class="o">=</span>https://code.phoffer.com/  
+Now you can host your blog on Github Pages. Congratulations!
+</code></pre></div></div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-02-20T00:00:00-07:00">February 20, 2016</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Getting+Ghost+onto+Github+Pages%20https%3A%2F%2Fcode.phoffer.com%2F2016%2F02%2F20%2Fgetting-ghost-onto-github-pages.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcode.phoffer.com%2F2016%2F02%2F20%2Fgetting-ghost-onto-github-pages.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fcode.phoffer.com%2F2016%2F02%2F20%2Fgetting-ghost-onto-github-pages.html" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fcode.phoffer.com%2F2016%2F02%2F20%2Fgetting-ghost-onto-github-pages.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="#" class="pagination--pager disabled">Previous</a>
     
     
-<div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+      <a href="https://code.phoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" class="pagination--pager" title="Smoothly upgrade did_you_mean gem for Ruby 2.3
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
@@ -250,9 +338,13 @@
     <p class="archive__item-excerpt" itemprop="description">I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directo...</p>
   </article>
 </div>
+        
+          
 
-<div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
@@ -272,9 +364,13 @@
     <p class="archive__item-excerpt" itemprop="description">A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to R...</p>
   </article>
 </div>
+        
+          
 
-<div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
@@ -294,9 +390,12 @@
     <p class="archive__item-excerpt" itemprop="description">Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it ...</p>
   </article>
 </div>
-
-  </div>
+        
+      </div>
+    </div>
+  
 </div>
+
     </div>
 
     

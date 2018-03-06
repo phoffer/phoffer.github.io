@@ -1,3 +1,1 @@
-User-agent: *
 Sitemap: https://code.phoffer.com/sitemap.xml
-Disallow: /ghost/
