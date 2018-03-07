@@ -10,7 +10,7 @@
     <meta charset="utf-8">
 
 <!-- begin _includes/seo.html --><title>Simple Setup of PostGIS Columns in Phoenix  Paul’s Blog</title>
-<meta name="description" content="The docs for geo_postgis are sufficient for figuring out how to use it, but doesn’t cover how to make it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a Point column in a recent project.">
+<meta name="description" content="Requirement: I need to create a schema that includes a PostGIS Point columm.">
 
 
 
@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://code.phoffer.com/2018/03/03/simple-setup-of-postgis-columns-in-phoenix.html">
 
 
-  <meta property="og:description" content="The docs for geo_postgis are sufficient for figuring out how to use it, but doesn’t cover how to make it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a Point column in a recent project.">
+  <meta property="og:description" content="Requirement: I need to create a schema that includes a PostGIS Point columm.">
 
 
 
@@ -282,7 +282,7 @@
 
   <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
     <meta itemprop="headline" content="Simple Setup of PostGIS Columns in Phoenix">
-    <meta itemprop="description" content="The docs for geo_postgis are sufficient for figuring out how to use it, but doesn’t cover how to make it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a Point column in a recent project.">
+    <meta itemprop="description" content="Requirement: I need to create a schema that includes a PostGIS Point columm.">
     <meta itemprop="datePublished" content="March 03, 2018">
     
 
@@ -305,20 +305,26 @@
 
       <section class="page__content" itemprop="text">
         
-        <p>The docs for <a href="https://github.com/bryanjos/geo_postgis">geo_postgis</a> are sufficient for figuring out how to use it, but doesn’t cover how to make it work with Phoenix generators, changesets, or tests. Here’s how I quickly set up a <code class="highlighter-rouge">Point</code> column in a recent project.</p>
+        <p><strong>Requirement:</strong> I need to create a schema that includes a PostGIS Point columm.</p>
 
-<p><strong>Goal:</strong> Use Phoenix generators (since Contexts are too useful to ignore), and have the generated changesets, views, and tests work with only minor tweaks.</p>
+<p><strong>Problem:</strong> Phoenix generators are great, but they don’t support special types, such as PostGIS columns.</p>
+
+<p>The docs for <a href="https://github.com/bryanjos/geo_postgis">geo_postgis</a> are sufficient for figuring out how to work with geographic data types, but they don’t cover how to make it work with Phoenix generators, changesets, or tests.</p>
+
+<p><strong>Goal:</strong> Use Phoenix generators (since contexts are too useful to ignore), and have the generated changesets, views, and tests work with only minor tweaks.</p>
+
+<p><strong>How:</strong> Use virtual attributes in the Ecto schema to be the bridge to the custom type.</p>
 
 <ol>
   <li>
     <p>First step is to plan out what type of data you will have, and what primitives it is composed of.</p>
 
-    <p>In this case, a <code class="highlighter-rouge">Point</code> has 2 floats, representing latitude and longitude. Most interaction will be with the float values instead of the <code class="highlighter-rouge">Geo.Point</code> struct. These 2 floats will eventually become virtual attributes to our schema struct.</p>
+    <p>In this case, a <code class="highlighter-rouge">Point</code> has 2 floats, representing latitude and longitude. Most interaction will be with the float values instead of the <code class="highlighter-rouge">Geo.Point</code> struct. These 2 floats will become virtual attributes to our schema struct.</p>
   </li>
   <li>
     <p>Use the virtual attributes in our generator.</p>
 
-    <p>For an <code class="highlighter-rouge">Map</code> context and a <code class="highlighter-rouge">locations</code> table, our generator command will look like this:</p>
+    <p>For a <code class="highlighter-rouge">Map</code> context and a <code class="highlighter-rouge">locations</code> table, our generator command will look like this:</p>
 
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mix phx.gen.html Map Location locations lng:float lat:float <span class="c"># ... other columns</span>
 </code></pre></div>    </div>
@@ -333,7 +339,7 @@
 
   <span class="k">def</span> <span class="n">change</span> <span class="k">do</span>
     <span class="n">create</span> <span class="n">table</span><span class="p">(</span><span class="ss">:locations</span><span class="p">)</span> <span class="k">do</span>
-      <span class="c1"># remove the lines for lat/lng</span>
+      <span class="c1"># remove the lines for lat/lng. They are commented here to show which lines</span>
       <span class="c1"># add :lat, :float</span>
       <span class="c1"># add :lng, :float</span>
     <span class="k">end</span>
@@ -384,7 +390,7 @@
   <li>
     <p>Update the generated tests:</p>
 
-    <p>Find <code class="highlighter-rouge">test/my_app/map/map_test.exs</code> and <code class="highlighter-rouge">test/my_app/controllers/location_controller_test.exs</code>, in order to add a check for th actual geo column.</p>
+    <p>Find <code class="highlighter-rouge">test/my_app/map/map_test.exs</code> and <code class="highlighter-rouge">test/my_app/controllers/location_controller_test.exs</code>. These tests must be updated to check the <code class="highlighter-rouge">coordinates</code> attribute instead of <code class="highlighter-rouge">lat</code>/<code class="highlighter-rouge">lng</code> attributes.</p>
 
     <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/controllers/location_controller_test.exs</span>
    
