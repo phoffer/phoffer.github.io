@@ -1431,6 +1431,24 @@ th {
     .btn--google-plus:visited {
       background-color: #dd4b39;
       color: #fff; }
+  .btn--reddit {
+    background-color: #ff4500;
+    color: #fff; }
+    .btn--reddit:hover {
+      background-color: #cc3700;
+      color: #fff; }
+    .btn--reddit:visited {
+      background-color: #ff4500;
+      color: #fff; }
+  .btn--hackernews {
+    background-color: #ff4000;
+    color: #fff; }
+    .btn--hackernews:hover {
+      background-color: #cc3300;
+      color: #fff; }
+    .btn--hackernews:visited {
+      background-color: #ff4000;
+      color: #fff; }
   .btn--linkedin {
     background-color: #007bb6;
     color: #fff; }
