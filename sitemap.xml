@@ -17,6 +17,10 @@
 <lastmod>2018-03-03T00:00:00-07:00</lastmod>
 </url>
 <url>
+<loc>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html</loc>
+<lastmod>2018-03-22T00:00:00-06:00</lastmod>
+</url>
+<url>
 <loc>https://www.paulhoffer.com/about/</loc>
 </url>
 <url>
@@ -36,5 +40,11 @@
 </url>
 <url>
 <loc>https://www.paulhoffer.com/tags/postgis/</loc>
+</url>
+<url>
+<loc>https://www.paulhoffer.com/tags/phoenix/</loc>
+</url>
+<url>
+<loc>https://www.paulhoffer.com/tags/plug/</loc>
 </url>
 </urlset>

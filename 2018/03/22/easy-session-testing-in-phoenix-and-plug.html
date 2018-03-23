@@ -1,0 +1,545 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.10.0 by Michael Rose
+  Copyright 2013-2018 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Easy Session Testing in Phoenix and Plug  Paul Hoffer</title>
+<meta name="description" content="Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (see below). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the Plug docs, it is not in the Phoenix guides or most online resources. The only place I’ve seen it is referenced far down a Github issue.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Paul Hoffer">
+<meta property="og:title" content="Easy Session Testing in Phoenix and Plug">
+<meta property="og:url" content="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html">
+
+
+  <meta property="og:description" content="Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (see below). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the Plug docs, it is not in the Phoenix guides or most online resources. The only place I’ve seen it is referenced far down a Github issue.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2018-03-22T00:00:00-06:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="https://www.paulhoffer.com/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://www.paulhoffer.com/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        
+        <a href="https://www.paulhoffer.com/">
+          <img src="https://www.paulhoffer.com/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
+        </a>
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <a href="https://www.paulhoffer.com/"><h3 class="author__name" itemprop="name">Paul Hoffer</h3></a>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects. I occasionally run and golf in my spare time.
+      </p>
+    
+  </div>
+
+
+  <div class="author__urls-wrapper">
+    
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/phoffer8" itemprop="sameAs">
+            <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs">
+            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/phoffer" itemprop="sameAs">
+            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs">
+            <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i> Stack Overflow
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Easy Session Testing in Phoenix and Plug">
+    <meta itemprop="description" content="Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (see below). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the Plug docs, it is not in the Phoenix guides or most online resources. The only place I’ve seen it is referenced far down a Github issue.">
+    <meta itemprop="datePublished" content="March 22, 2018">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Easy Session Testing in Phoenix and Plug
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (<a href="#older-approaches">see below</a>). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the <a href="https://hexdocs.pm/plug/Plug.Test.html#init_test_session/2">Plug docs</a>, it is not in the Phoenix guides or most online resources. The only place I’ve seen it is referenced far down a <a href="https://github.com/phoenixframework/phoenix/issues/861#issuecomment-294711607">Github issue</a>.</p>
+
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Plug</span><span class="o">.</span><span class="no">Test</span><span class="o">.</span><span class="n">init_test_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">current_user_id:</span> <span class="m">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>That’s it!</strong></p>
+
+<p>There are a couple ways to utilize this. Let’s take an autogenerated controller test:</p>
+
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span> <span class="sd">"</span><span class="s2">index"</span> <span class="k">do</span>
+  <span class="n">test</span> <span class="sd">"</span><span class="s2">lists all users"</span><span class="p">,</span> <span class="p">%{</span><span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span> <span class="k">do</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">get</span> <span class="n">conn</span><span class="p">,</span> <span class="n">admin_user_path</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">:index</span><span class="p">)</span>
+    <span class="n">assert</span> <span class="n">html_response</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="m">200</span><span class="p">)</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">Listing Users"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>To set session just for this test, we just have to add one line:</p>
+
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span> <span class="sd">"</span><span class="s2">index"</span> <span class="k">do</span>
+  <span class="n">test</span> <span class="sd">"</span><span class="s2">lists all users"</span><span class="p">,</span> <span class="p">%{</span><span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span> <span class="k">do</span>
+    <span class="c1"># this could be streamlined using pipes |&gt;</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="no">Plug</span><span class="o">.</span><span class="no">Test</span><span class="o">.</span><span class="n">init_test_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">current_user_id:</span> <span class="m">1</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">get</span> <span class="n">conn</span><span class="p">,</span> <span class="n">admin_user_path</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">:index</span><span class="p">)</span>
+    <span class="n">assert</span> <span class="n">html_response</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="m">200</span><span class="p">)</span> <span class="o">=~</span> <span class="sd">"</span><span class="s2">Listing Users"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>If we wanted to set a session value for an entire set of controller tests, that’s simple too. We just need to add one block in the test:</p>
+
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">defmodule</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">UserControllerTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">ConnCase</span>
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">User</span>
+
+  <span class="c1"># ... add the following block:</span>
+
+  <span class="n">setup</span> <span class="p">%{</span><span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span> <span class="k">do</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
+      <span class="o">|&gt;</span> <span class="no">Plug</span><span class="o">.</span><span class="no">Test</span><span class="o">.</span><span class="n">init_test_session</span><span class="p">(</span><span class="ss">current_user_id:</span> <span class="m">1</span><span class="p">)</span>
+    <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span>
+  <span class="k">end</span>
+  <span class="c1"># ... rest of tests will now have that session value</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now, the <code class="highlighter-rouge">conn</code> struct used for all the tests will have <code class="highlighter-rouge">current_user_id: 1</code> set in session, as expected. This is a huge improvement, since it removes the complexity and ambiguity of previous ways to accomplish testing session data.</p>
+
+<h3 id="older-approaches">Older approaches</h3>
+
+<p>There are quite a few older approaches, most of which are more complex approaches which may not work in all situations. Typically, they require either <a href="https://gist.github.com/tsubery/2e7d118a51702c1e24741b9e2d9dfdbf">customizing the <code class="highlighter-rouge">conn</code> used in tests</a> or by using <a href="https://stackoverflow.com/a/31983168/366051">tags paired with custom connection setup</a>. Sometimes, this includes <a href="https://elixirforum.com/t/test-for-sessions-in-phoenix/2569">bypassing pipelines</a>. There are other ways which include tweaking your app’s pipelines(<a href="https://stackoverflow.com/a/42348255/366051">1</a>, <a href="https://stackoverflow.com/a/38173072/366051">2</a>) and <a href="http://work.stevegrossi.com/2016/06/02/testing-current-user-in-a-phoenix-app-the-easy-way/">setting <code class="highlighter-rouge">current_user</code> directly</a>.</p>
+
+<p>To be clear, all of these approaches work, and have been necessary in the past. But luckily, <a href="https://github.com/elixir-plug/plug/commit/1c1b1b41b0b9f535847862d7804f7194d0f0379d">Plug 1.5 added</a> made this all much simpler.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://www.paulhoffer.com/tags/elixir" class="page__taxonomy-item" style="color: #fff; background-color: #6e4a7e;" rel="tag">elixir</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://www.paulhoffer.com/tags/phoenix" class="page__taxonomy-item" style="color: #fff; background-color: #EE552F;" rel="tag">phoenix</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://www.paulhoffer.com/tags/plug" class="page__taxonomy-item"  rel="tag">plug</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2018-03-22T00:00:00-06:00">March 22, 2018</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Easy+Session+Testing+in+Phoenix+and+Plug%20https%3A%2F%2Fwww.paulhoffer.com%2F2018%2F03%2F22%2Feasy-session-testing-in-phoenix-and-plug.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+  <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.paulhoffer.com%2F2018%2F03%2F22%2Feasy-session-testing-in-phoenix-and-plug.html&title=Easy+Session+Testing+in+Phoenix+and+Plug" class="btn btn--reddit" onclick="window.open(this.href, 'window', ''); return false;" title="Share on Reddit"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i><span> Reddit</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.paulhoffer.com%2F2018%2F03%2F22%2Feasy-session-testing-in-phoenix-and-plug.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  <a href="https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fwww.paulhoffer.com%2F2018%2F03%2F22%2Feasy-session-testing-in-phoenix-and-plug.html&t=Easy+Session+Testing+in+Phoenix+and+Plug" class="btn btn--hackernews" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Hacker News"><i class="fab fa-fw fa-hacker-news" aria-hidden="true"></i><span> Hacker News</span></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.paulhoffer.com%2F2018%2F03%2F22%2Feasy-session-testing-in-phoenix-and-plug.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fwww.paulhoffer.com%2F2018%2F03%2F22%2Feasy-session-testing-in-phoenix-and-plug.html" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" class="pagination--pager" title="Simple Setup of PostGIS Columns with Phoenix Generators
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="permalink">Simple Setup of PostGIS Columns with Phoenix Generators
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.
+
+</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="permalink">Force git to treat Keynote files as binary
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directo...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="permalink">Smoothly upgrade did_you_mean gem for Ruby 2.3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to R...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html" rel="permalink">Getting Ghost onto Github Pages
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it ...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><input type="text" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+    <div id="results" class="results"></div></div>
+      </div>
+    
+
+    
+
+    
+  <script src="https://www.paulhoffer.com/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+
+
+
+<script src="https://www.paulhoffer.com/assets/js/lunr/lunr.min.js"></script>
+<script src="https://www.paulhoffer.com/assets/js/lunr/lunr-store.js"></script>
+<script src="https://www.paulhoffer.com/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-41717657-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+
+
+
+
+  </body>
+</html>
