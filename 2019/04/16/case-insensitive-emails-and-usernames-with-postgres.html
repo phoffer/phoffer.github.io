@@ -357,7 +357,7 @@ bundle <span class="nb">exec </span>rails db.migrate
 </code></pre></div></div>
 <p><strong>Note about the Rails tests:</strong> When using <code class="highlighter-rouge">validates_uniqueness_of</code>, ActiveSupport will return an unpersisted model object, which includes the validation errors. Therefore, we use one assertion when relying on Postgres and a different assertion when using the validation helper. Because there are varying opinions on using <code class="highlighter-rouge">validates_uniqueness_of</code>, I’ve included both examples.</p>
 
-<p><strong>Summary:</strong> Using <code class="highlighter-rouge">citext</code> makes things easier for us. We don’t have to worry about character case or data integrity, it’s just automatically handled for us. Actual code for the Phoenix example is available on the [<code class="highlighter-rouge">citext</code> branch of my phoenix_examples repo on Github](https://github.com/phoffer/phoenix_examples/tree/citext.</p>
+<p><strong>Summary:</strong> Using <code class="highlighter-rouge">citext</code> makes things easier for us. We don’t have to worry about character case or data integrity, it’s just automatically handled for us. Actual code for the Phoenix example is available on the <a href="https://github.com/phoffer/phoenix_examples/tree/citext"><code class="highlighter-rouge">citext</code> branch of my phoenix_examples repo on Github</a>.</p>
 
         
       </section>
