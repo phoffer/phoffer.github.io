@@ -1,9 +1,9 @@
 <!doctype html>
 <!--
-  Minimal Mistakes Jekyll Theme 4.10.0 by Michael Rose
-  Copyright 2013-2018 Michael Rose - mademistakes.com | @mmistakes
+  Minimal Mistakes Jekyll Theme 4.16.0 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
   Free for personal and commercial use under the MIT license
-  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
 -->
 <html lang="en" class="no-js">
   <head>
@@ -49,11 +49,9 @@
 <!-- end _includes/seo.html -->
 
 
-<link href="https://www.paulhoffer.com/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
 
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
+<!-- https://t.co/dKP3o1e -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script>
@@ -61,9 +59,9 @@
 </script>
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://www.paulhoffer.com/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css">
 
-<!--[if lte IE 9]>
+<!--[if IE ]>
   <style>
     /* old IE unsupported flexbox fixes */
     .greedy-nav .site-title {
@@ -77,6 +75,7 @@
     }
   </style>
 <![endif]-->
+
 
 
     <!-- start custom head snippets -->
@@ -107,7 +106,7 @@
   
 
 
-<div itemscope itemtype="http://schema.org/Person">
+<div itemscope itemtype="https://schema.org/Person">
 
   
     <div class="author__avatar">
@@ -115,8 +114,8 @@
 
       
         
-        <a href="https://www.paulhoffer.com/">
-          <img src="https://www.paulhoffer.com/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
+        <a href="/">
+          <img src="/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
         </a>
       
     </div>
@@ -124,11 +123,11 @@
 
   <div class="author__content">
     
-      <a href="https://www.paulhoffer.com/"><h3 class="author__name" itemprop="name">Paul Hoffer</h3></a>
+      <a href="/"><h3 class="author__name" itemprop="name">Paul Hoffer</h3></a>
     
     
       <p class="author__bio" itemprop="description">
-        Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects. I occasionally run and golf in my spare time.
+        Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects. I like to golf and run in my spare time.
       </p>
     
   </div>
@@ -147,8 +146,10 @@
       
 
       
+
+      
         <li>
-          <a href="https://twitter.com/phoffer8" itemprop="sameAs">
+          <a href="https://twitter.com/phoffer8" itemprop="sameAs" rel="nofollow noopener noreferrer">
             <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
           </a>
         </li>
@@ -157,10 +158,8 @@
       
 
       
-
-      
         <li>
-          <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs">
+          <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
             <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
           </a>
         </li>
@@ -176,7 +175,7 @@
 
       
         <li>
-          <a href="https://github.com/phoffer" itemprop="sameAs">
+          <a href="https://github.com/phoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
             <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
           </a>
         </li>
@@ -186,7 +185,7 @@
 
       
         <li>
-          <a href="https://www.stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs">
+          <a href="https://stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
             <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i> Stack Overflow
           </a>
         </li>
@@ -216,7 +215,7 @@
 
       <!--
   <li>
-    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
       <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
@@ -231,15 +230,39 @@
 
   <div class="archive">
     
-      <h1 class="page__title"></h1>
+      <h1 id="page-title" class="page__title"></h1>
     
     
 <div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="permalink">Easy Session Testing in Phoenix and Plug
+        <a href="/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html" rel="permalink">Case insensitive emails and usernames with Postgres
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.
+
+</p>
+  </article>
+</div>
+
+<div class="list__item">
+  <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="permalink">Easy Session Testing in Phoenix and Plug
 </a>
       
     </h2>
@@ -257,11 +280,11 @@
 </div>
 
 <div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="permalink">Simple Setup of PostGIS Columns with Phoenix Generators
+        <a href="/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="permalink">Simple Setup of PostGIS Columns with Phoenix Generators
 </a>
       
     </h2>
@@ -281,11 +304,11 @@
 </div>
 
 <div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="permalink">Force git to treat Keynote files as binary
+        <a href="/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="permalink">Force git to treat Keynote files as binary
 </a>
       
     </h2>
@@ -303,11 +326,11 @@
 </div>
 
 <div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="permalink">Smoothly upgrade did_you_mean gem for Ruby 2.3
+        <a href="/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="permalink">Smoothly upgrade did_you_mean gem for Ruby 2.3
 </a>
       
     </h2>
@@ -325,11 +348,11 @@
 </div>
 
 <div class="list__item">
-  <article class="archive__item" itemscope="" itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope="" itemtype="https://schema.org/CreativeWork">
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html" rel="permalink">Getting Ghost onto Github Pages
+        <a href="/2016/02/20/getting-ghost-onto-github-pages.html" rel="permalink">Getting Ghost onto Github Pages
 </a>
       
     </h2>
@@ -346,44 +369,32 @@
   </article>
 </div>
 
+
   </div>
 </div>
     </div>
 
     
       <div class="search-content">
-        <div class="search-content__inner-wrap"><input type="text" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+        <div class="search-content__inner-wrap"><input type="search" id="search" aria-placeholder="Enter your search term..." class="search-input" tabindex="-1" placeholder="Enter your search term..." />
     <div id="results" class="results"></div></div>
+
       </div>
     
 
     
 
     
-  <script src="https://www.paulhoffer.com/assets/js/main.min.js"></script>
-  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
 
 
 
 
-<script src="https://www.paulhoffer.com/assets/js/lunr/lunr.min.js"></script>
-<script src="https://www.paulhoffer.com/assets/js/lunr/lunr-store.js"></script>
-<script src="https://www.paulhoffer.com/assets/js/lunr/lunr-en.js"></script>
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
 
-
-
-
-  <script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-41717657-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
 
 
 

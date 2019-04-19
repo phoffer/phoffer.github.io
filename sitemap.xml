@@ -10,7 +10,7 @@
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html</loc>
-<lastmod>2016-09-21T00:00:00-06:00</lastmod>
+<lastmod>2016-09-21T00:00:00-07:00</lastmod>
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html</loc>
@@ -18,7 +18,11 @@
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html</loc>
-<lastmod>2018-03-22T00:00:00-06:00</lastmod>
+<lastmod>2018-03-22T00:00:00-07:00</lastmod>
+</url>
+<url>
+<loc>https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html</loc>
+<lastmod>2019-04-16T00:00:00-07:00</lastmod>
 </url>
 <url>
 <loc>https://www.paulhoffer.com/about/</loc>
@@ -46,5 +50,8 @@
 </url>
 <url>
 <loc>https://www.paulhoffer.com/tags/plug/</loc>
+</url>
+<url>
+<loc>https://www.paulhoffer.com/tags/rails/</loc>
 </url>
 </urlset>

@@ -1,0 +1,594 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.16.0 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Case insensitive emails and usernames with Postgres - Paul Hoffer</title>
+<meta name="description" content="TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Paul Hoffer">
+<meta property="og:title" content="Case insensitive emails and usernames with Postgres">
+<meta property="og:url" content="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html">
+
+
+  <meta property="og:description" content="TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2019-04-16T00:00:00-07:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE ]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        
+        <a href="/">
+          <img src="/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
+        </a>
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <a href="/"><h3 class="author__name" itemprop="name">Paul Hoffer</h3></a>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects. I like to golf and run in my spare time.
+      </p>
+    
+  </div>
+
+
+  <div class="author__urls-wrapper">
+    
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/phoffer8" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/phoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+        <li>
+          <a href="https://stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i> Stack Overflow
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Case insensitive emails and usernames with Postgres">
+    <meta itemprop="description" content="TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.">
+    <meta itemprop="datePublished" content="April 16, 2019">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Case insensitive emails and usernames with Postgres
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p><strong>TLDR:</strong> Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.</p>
+
+<hr />
+
+<p><strong>Problem:</strong> Emails and usernames usually need to be unique and case insensitive. Typically, this gets handled one of two ways: lowercasing the value when saving, or less frequently, creating a unique index for email/username that uses the lowercase version, like <code class="highlighter-rouge">LOWER(username)</code></p>
+
+<p>Both of these have issues though. Lowering the values loses data and can be annoying later on, and also puts responsibility for data integrity on the developer. Using a <code class="highlighter-rouge">LOWER()</code> index doesn’t lose data, but it requires lowering values when querying on that field.</p>
+
+<p><strong>Solution:</strong> Postgres has a case insensitive text extension, called <code class="highlighter-rouge">citext</code> (big surprise). Citext works exactly like a text column, except it keeps the submitted value and indexes it how we want. <strong>This means we never have to worry about case sensitivity in our application code.</strong></p>
+
+<p><strong>Support:</strong> Phoenix (Ecto) and Rails (ActiveRecord) both support citext, each with only a tiny tweak necessary. Additionally, because Postgres doesn’t enable the Citext extension by default, we need to enable it via a migration.</p>
+
+<p><strong>Example:</strong> Using fresh Phoenix and Rails apps, let’s add a <code class="highlighter-rouge">users</code> table that has a single column, <code class="highlighter-rouge">email</code>. Using the built in generators will help show how minimal the tweaking required is.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Phoenix</span>
+mix phx.gen.html Accounts User <span class="nb">users </span>email:string
+<span class="c"># Phoenix doesn't accept :citext as a valid type for the generator, so we will use :string here. </span>
+
+<span class="c"># Rails</span>
+bundle <span class="nb">exec </span>rails generate model User email:citext
+</code></pre></div></div>
+
+<p>After running the generators, here’s the tweaks needed for both Phoenix and Rails:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code># priv/repo/migrations/20190416235625_create_users.exs
+
+  use Ecto.Migration
+
+  def change do
+<span class="gi">+   execute "CREATE EXTENSION IF NOT EXISTS citext",  "DROP EXTENSION IF EXISTS citext"
+</span>    create table(:users) do
+<span class="gd">-     add :email, :string
+</span><span class="gi">+     add :email, :citext
+</span>
+      timestamps()
+    end
+<span class="gi">+   create index(:users, [:email], unique: true)
+</span>
+  end
+
+# db/migrate/20190416235153_create_users.rb
+
+  def change
+<span class="gi">+   enable_extension(:citext)
+</span>    create_table :users do |t|
+      t.citext :email
+<span class="gi">+     t.index :email, unique: true
+</span>
+      t.timestamps
+    end
+
+</code></pre></div></div>
+
+<p>Now it’s ready to go! Let’s run the migrations and add some tests to verify it works.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Phoenix</span>
+mix ecto.migrate
+
+<span class="c"># Rails</span>
+bundle <span class="nb">exec </span>rails db.migrate
+</code></pre></div></div>
+
+<p>Couple quick tests to double check.</p>
+
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/accounts/accounts_test.exs</span>
+
+<span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">AccountsTest</span> <span class="k">do</span>
+  <span class="c1"># ...</span>
+  <span class="n">describe</span> <span class="sd">"</span><span class="s2">users"</span> <span class="k">do</span>
+    <span class="c1"># ...</span>
+    <span class="n">test</span> <span class="sd">"</span><span class="s2">can't duplicate case insensitive emails"</span> <span class="k">do</span>
+      <span class="n">email</span> <span class="o">=</span> <span class="sd">"</span><span class="s2">ASDF@example.com"</span>
+      <span class="n">user</span> <span class="o">=</span> <span class="no">Accounts</span><span class="o">.</span><span class="n">create_user</span><span class="p">(%{</span><span class="ss">email:</span> <span class="n">email</span><span class="p">})</span>
+      <span class="n">assert</span> <span class="p">{</span><span class="ss">:error</span><span class="p">,</span> <span class="p">%</span><span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span><span class="p">{</span><span class="ss">errors:</span> <span class="p">[</span><span class="ss">email:</span> <span class="p">{</span><span class="sd">"</span><span class="s2">has already been taken"</span><span class="p">,</span> <span class="n">_</span><span class="p">}]}</span> <span class="p">}</span> <span class="o">=</span> <span class="no">Accounts</span><span class="o">.</span><span class="n">create_user</span><span class="p">(%{</span><span class="ss">email:</span> <span class="no">String</span><span class="o">.</span><span class="n">downcase</span><span class="p">(</span><span class="n">email</span><span class="p">)})</span>
+    <span class="k">end</span>
+    <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/models/user_test.rb</span>
+
+<span class="k">class</span> <span class="nc">UserTest</span> <span class="o">&lt;</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">TestCase</span>
+  <span class="n">setup</span> <span class="k">do</span>
+    <span class="vi">@email</span> <span class="o">=</span> <span class="s2">"ASDF@example.com"</span>
+    <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="nb">test</span> <span class="s2">"looks up case insensitive email"</span> <span class="k">do</span>
+    <span class="n">assert_equal</span> <span class="vi">@user</span><span class="p">,</span> <span class="no">User</span><span class="p">.</span><span class="nf">find_by</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">.</span><span class="nf">downcase</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="nb">test</span> <span class="s2">"can't duplicate case insensitive emails"</span> <span class="k">do</span>
+    <span class="c1"># DB constraint will raise an error</span>
+    <span class="n">assert_raise</span><span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">RecordNotUnique</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">.</span><span class="nf">downcase</span><span class="p">)</span> <span class="p">}</span>
+
+    <span class="c1"># validates_uniqueness_of will return a user object which is not persisted to the DB, and has an error on it</span>
+    <span class="n">assert_equal</span> <span class="p">[</span><span class="s2">"has already been taken"</span><span class="p">],</span> <span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">.</span><span class="nf">downcase</span><span class="p">).</span><span class="nf">errors</span><span class="p">.</span><span class="nf">messages</span><span class="p">[</span><span class="ss">:email</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p><strong>Note about the Rails tests:</strong> When using <code class="highlighter-rouge">validates_uniqueness_of</code>, ActiveSupport will return an unpersisted model object, which includes the validation errors. Therefore, we use one assertion when relying on Postgres and a different assertion when using the validation helper. Because there are varying opinions on using <code class="highlighter-rouge">validates_uniqueness_of</code>, I’ve included both examples.</p>
+
+<p><strong>Summary:</strong> Using <code class="highlighter-rouge">citext</code> makes things easier for us. We don’t have to worry about character case or data integrity, it’s just automatically handled for us.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/ecto" class="page__taxonomy-item" style="color: #fff; background-color: #74B54B;" rel="tag">ecto</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/elixir" class="page__taxonomy-item" style="color: #fff; background-color: #6e4a7e;" rel="tag">elixir</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/phoenix" class="page__taxonomy-item" style="color: #fff; background-color: #EE552F;" rel="tag">phoenix</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/postgis" class="page__taxonomy-item" style="color: #fff; background-color: #6C89AB;" rel="tag">postgis</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/rails" class="page__taxonomy-item" style="color: #fff; background-color: #BD261A;" rel="tag">rails</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/ruby" class="page__taxonomy-item" style="color: #fff; background-color: #CC342D;" rel="tag">ruby</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2019-04-16T00:00:00-07:00">April 16, 2019</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Case+insensitive+emails+and+usernames+with+Postgres%20https%3A%2F%2Fwww.paulhoffer.com%2F2019%2F04%2F16%2Fcase-insensitive-emails-and-usernames-with-postgres.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+  <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.paulhoffer.com%2F2019%2F04%2F16%2Fcase-insensitive-emails-and-usernames-with-postgres.html&title=Case+insensitive+emails+and+usernames+with+Postgres" class="btn btn--reddit" onclick="window.open(this.href, 'window', ''); return false;" title="Share on Reddit"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i><span> Reddit</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.paulhoffer.com%2F2019%2F04%2F16%2Fcase-insensitive-emails-and-usernames-with-postgres.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  <a href="https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fwww.paulhoffer.com%2F2019%2F04%2F16%2Fcase-insensitive-emails-and-usernames-with-postgres.html&t=Case+insensitive+emails+and+usernames+with+Postgres" class="btn btn--hackernews" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Hacker News"><i class="fab fa-fw fa-hacker-news" aria-hidden="true"></i><span> Hacker News</span></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.paulhoffer.com%2F2019%2F04%2F16%2Fcase-insensitive-emails-and-usernames-with-postgres.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" class="pagination--pager" title="Easy Session Testing in Phoenix and Plug
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="permalink">Easy Session Testing in Phoenix and Plug
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has trad...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="permalink">Simple Setup of PostGIS Columns with Phoenix Generators
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.
+
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="permalink">Force git to treat Keynote files as binary
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directo...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="permalink">Smoothly upgrade did_you_mean gem for Ruby 2.3
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to R...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><input type="search" id="search" aria-placeholder="Enter your search term..." class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+    <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

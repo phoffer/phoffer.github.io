@@ -1,4 +1,104 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.paulhoffer.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.paulhoffer.com/" rel="alternate" type="text/html" /><updated>2018-03-23T10:43:27-06:00</updated><id>https://www.paulhoffer.com/</id><title type="html">Paul Hoffer</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><author><name>Paul Hoffer</name></author><entry><title type="html">Easy Session Testing in Phoenix and Plug</title><link href="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="alternate" type="text/html" title="Easy Session Testing in Phoenix and Plug" /><published>2018-03-22T00:00:00-06:00</published><updated>2018-03-22T00:00:00-06:00</updated><id>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug</id><content type="html" xml:base="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html">&lt;p&gt;Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (&lt;a href=&quot;#older-approaches&quot;&gt;see below&lt;/a&gt;). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the &lt;a href=&quot;https://hexdocs.pm/plug/Plug.Test.html#init_test_session/2&quot;&gt;Plug docs&lt;/a&gt;, it is not in the Phoenix guides or most online resources. The only place I’ve seen it referenced is far down a &lt;a href=&quot;https://github.com/phoenixframework/phoenix/issues/861#issuecomment-294711607&quot;&gt;Github issue&lt;/a&gt;.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.paulhoffer.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.paulhoffer.com/" rel="alternate" type="text/html" /><updated>2019-04-19T08:24:01-07:00</updated><id>https://www.paulhoffer.com/feed.xml</id><title type="html">Paul Hoffer</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><author><name>Paul Hoffer</name></author><entry><title type="html">Case insensitive emails and usernames with Postgres</title><link href="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html" rel="alternate" type="text/html" title="Case insensitive emails and usernames with Postgres" /><published>2019-04-16T00:00:00-07:00</published><updated>2019-04-16T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres</id><content type="html" xml:base="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html">&lt;p&gt;&lt;strong&gt;TLDR:&lt;/strong&gt; Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Problem:&lt;/strong&gt; Emails and usernames usually need to be unique and case insensitive. Typically, this gets handled one of two ways: lowercasing the value when saving, or less frequently, creating a unique index for email/username that uses the lowercase version, like &lt;code class=&quot;highlighter-rouge&quot;&gt;LOWER(username)&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Both of these have issues though. Lowering the values loses data and can be annoying later on, and also puts responsibility for data integrity on the developer. Using a &lt;code class=&quot;highlighter-rouge&quot;&gt;LOWER()&lt;/code&gt; index doesn’t lose data, but it requires lowering values when querying on that field.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt; Postgres has a case insensitive text extension, called &lt;code class=&quot;highlighter-rouge&quot;&gt;citext&lt;/code&gt; (big surprise). Citext works exactly like a text column, except it keeps the submitted value and indexes it how we want. &lt;strong&gt;This means we never have to worry about case sensitivity in our application code.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Support:&lt;/strong&gt; Phoenix (Ecto) and Rails (ActiveRecord) both support citext, each with only a tiny tweak necessary. Additionally, because Postgres doesn’t enable the Citext extension by default, we need to enable it via a migration.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Example:&lt;/strong&gt; Using fresh Phoenix and Rails apps, let’s add a &lt;code class=&quot;highlighter-rouge&quot;&gt;users&lt;/code&gt; table that has a single column, &lt;code class=&quot;highlighter-rouge&quot;&gt;email&lt;/code&gt;. Using the built in generators will help show how minimal the tweaking required is.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Phoenix&lt;/span&gt;
+mix phx.gen.html Accounts User &lt;span class=&quot;nb&quot;&gt;users &lt;/span&gt;email:string
+&lt;span class=&quot;c&quot;&gt;# Phoenix doesn't accept :citext as a valid type for the generator, so we will use :string here. &lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Rails&lt;/span&gt;
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rails generate model User email:citext
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After running the generators, here’s the tweaks needed for both Phoenix and Rails:&lt;/p&gt;
+
+&lt;div class=&quot;language-diff highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# priv/repo/migrations/20190416235625_create_users.exs
+
+  use Ecto.Migration
+
+  def change do
+&lt;span class=&quot;gi&quot;&gt;+   execute &quot;CREATE EXTENSION IF NOT EXISTS citext&quot;,  &quot;DROP EXTENSION IF EXISTS citext&quot;
+&lt;/span&gt;    create table(:users) do
+&lt;span class=&quot;gd&quot;&gt;-     add :email, :string
+&lt;/span&gt;&lt;span class=&quot;gi&quot;&gt;+     add :email, :citext
+&lt;/span&gt;
+      timestamps()
+    end
+&lt;span class=&quot;gi&quot;&gt;+   create index(:users, [:email], unique: true)
+&lt;/span&gt;
+  end
+
+# db/migrate/20190416235153_create_users.rb
+
+  def change
+&lt;span class=&quot;gi&quot;&gt;+   enable_extension(:citext)
+&lt;/span&gt;    create_table :users do |t|
+      t.citext :email
+&lt;span class=&quot;gi&quot;&gt;+     t.index :email, unique: true
+&lt;/span&gt;
+      t.timestamps
+    end
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now it’s ready to go! Let’s run the migrations and add some tests to verify it works.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Phoenix&lt;/span&gt;
+mix ecto.migrate
+
+&lt;span class=&quot;c&quot;&gt;# Rails&lt;/span&gt;
+bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rails db.migrate
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Couple quick tests to double check.&lt;/p&gt;
+
+&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# test/my_app/accounts/accounts_test.exs&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;AccountsTest&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;users&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;can't duplicate case insensitive emails&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ASDF@example.com&quot;&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Accounts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Ecto&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Changeset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;errors:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;has already been taken&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]}&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Accounts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)})&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# test/models/user_test.rb&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;UserTest&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveSupport&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;TestCase&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;setup&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ASDF@example.com&quot;&lt;/span&gt;
+    &lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;looks up case insensitive email&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;assert_equal&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find_by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;can't duplicate case insensitive emails&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# DB constraint will raise an error&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;assert_raise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;RecordNotUnique&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# validates_uniqueness_of will return a user object which is not persisted to the DB, and has an error on it&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;assert_equal&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;has already been taken&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;errors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;messages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Note about the Rails tests:&lt;/strong&gt; When using &lt;code class=&quot;highlighter-rouge&quot;&gt;validates_uniqueness_of&lt;/code&gt;, ActiveSupport will return an unpersisted model object, which includes the validation errors. Therefore, we use one assertion when relying on Postgres and a different assertion when using the validation helper. Because there are varying opinions on using &lt;code class=&quot;highlighter-rouge&quot;&gt;validates_uniqueness_of&lt;/code&gt;, I’ve included both examples.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Summary:&lt;/strong&gt; Using &lt;code class=&quot;highlighter-rouge&quot;&gt;citext&lt;/code&gt; makes things easier for us. We don’t have to worry about character case or data integrity, it’s just automatically handled for us.&lt;/p&gt;</content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="ruby" /><category term="rails" /><category term="postgis" /><summary type="html">TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.</summary></entry><entry><title type="html">Easy Session Testing in Phoenix and Plug</title><link href="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="alternate" type="text/html" title="Easy Session Testing in Phoenix and Plug" /><published>2018-03-22T00:00:00-07:00</published><updated>2018-03-22T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug</id><content type="html" xml:base="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html">&lt;p&gt;Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (&lt;a href=&quot;#older-approaches&quot;&gt;see below&lt;/a&gt;). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the &lt;a href=&quot;https://hexdocs.pm/plug/Plug.Test.html#init_test_session/2&quot;&gt;Plug docs&lt;/a&gt;, it is not in the Phoenix guides or most online resources. The only place I’ve seen it referenced is far down a &lt;a href=&quot;https://github.com/phoenixframework/phoenix/issues/861#issuecomment-294711607&quot;&gt;Github issue&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;Plug&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init_test_session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;current_user_id:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -201,7 +301,7 @@
 
     &lt;p&gt;Now go celebrate by adding some real functionality!&lt;/p&gt;
   &lt;/li&gt;
-&lt;/ol&gt;</content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="postgis" /><summary type="html">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.</summary></entry><entry><title type="html">Force git to treat Keynote files as binary</title><link href="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="alternate" type="text/html" title="Force git to treat Keynote files as binary" /><published>2016-09-21T00:00:00-06:00</published><updated>2016-09-21T00:00:00-06:00</updated><id>https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary</id><content type="html" xml:base="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html">&lt;p&gt;I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:&lt;/p&gt;
+&lt;/ol&gt;</content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="postgis" /><summary type="html">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.</summary></entry><entry><title type="html">Force git to treat Keynote files as binary</title><link href="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="alternate" type="text/html" title="Force git to treat Keynote files as binary" /><published>2016-09-21T00:00:00-07:00</published><updated>2016-09-21T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary</id><content type="html" xml:base="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html">&lt;p&gt;I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:&lt;/p&gt;
 
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git status
 ...
