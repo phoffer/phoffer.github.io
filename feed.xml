@@ -1,309 +1,309 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.paulhoffer.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.paulhoffer.com/" rel="alternate" type="text/html" /><updated>2019-04-19T17:01:21-07:00</updated><id>https://www.paulhoffer.com/feed.xml</id><title type="html">Paul Hoffer</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><author><name>Paul Hoffer</name></author><entry><title type="html">Case insensitive emails and usernames with Postgres</title><link href="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html" rel="alternate" type="text/html" title="Case insensitive emails and usernames with Postgres" /><published>2019-04-16T00:00:00-07:00</published><updated>2019-04-16T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres</id><content type="html" xml:base="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html">&lt;p&gt;&lt;strong&gt;TLDR:&lt;/strong&gt; Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://www.paulhoffer.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.paulhoffer.com/" rel="alternate" type="text/html" /><updated>2023-04-20T08:31:19-07:00</updated><id>https://www.paulhoffer.com/feed.xml</id><title type="html">Paul Hoffer</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><author><name>Paul Hoffer</name></author><entry><title type="html">Case insensitive emails and usernames with Postgres</title><link href="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html" rel="alternate" type="text/html" title="Case insensitive emails and usernames with Postgres" /><published>2019-04-16T00:00:00-07:00</published><updated>2019-04-16T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres</id><content type="html" xml:base="https://www.paulhoffer.com/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html"><![CDATA[<p><strong>TLDR:</strong> Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.</p>
 
-&lt;hr /&gt;
+<hr />
 
-&lt;p&gt;&lt;strong&gt;Problem:&lt;/strong&gt; Emails and usernames usually need to be unique and case insensitive. Typically, this gets handled one of two ways: lowercasing the value when saving, or less frequently, creating a unique index for email/username that uses the lowercase version, like &lt;code class=&quot;highlighter-rouge&quot;&gt;LOWER(username)&lt;/code&gt;&lt;/p&gt;
+<p><strong>Problem:</strong> Emails and usernames usually need to be unique and case insensitive. Typically, this gets handled one of two ways: lowercasing the value when saving, or less frequently, creating a unique index for email/username that uses the lowercase version, like <code class="language-plaintext highlighter-rouge">LOWER(username)</code></p>
 
-&lt;p&gt;Both of these have issues though. Lowering the values loses data and can be annoying later on, and also puts responsibility for data integrity on the developer. Using a &lt;code class=&quot;highlighter-rouge&quot;&gt;LOWER()&lt;/code&gt; index doesn’t lose data, but it requires lowering values when querying on that field.&lt;/p&gt;
+<p>Both of these have issues though. Lowering the values loses data and can be annoying later on, and also puts responsibility for data integrity on the developer. Using a <code class="language-plaintext highlighter-rouge">LOWER()</code> index doesn’t lose data, but it requires lowering values when querying on that field.</p>
 
-&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt; Postgres has a case insensitive text extension, called &lt;code class=&quot;highlighter-rouge&quot;&gt;citext&lt;/code&gt; (big surprise). Citext works exactly like a text column, except it keeps the submitted value and indexes it how we want. &lt;strong&gt;This means we never have to worry about case sensitivity in our application code.&lt;/strong&gt;&lt;/p&gt;
+<p><strong>Solution:</strong> Postgres has a case insensitive text extension, called <code class="language-plaintext highlighter-rouge">citext</code> (big surprise). Citext works exactly like a text column, except it keeps the submitted value and indexes it how we want. <strong>This means we never have to worry about case sensitivity in our application code.</strong></p>
 
-&lt;p&gt;&lt;strong&gt;Support:&lt;/strong&gt; Phoenix (Ecto) and Rails (ActiveRecord) both support citext, each with only a tiny tweak necessary. Additionally, because Postgres doesn’t enable the Citext extension by default, we need to enable it via a migration.&lt;/p&gt;
+<p><strong>Support:</strong> Phoenix (Ecto) and Rails (ActiveRecord) both support citext, each with only a tiny tweak necessary. Additionally, because Postgres doesn’t enable the Citext extension by default, we need to enable it via a migration.</p>
 
-&lt;p&gt;&lt;strong&gt;Example:&lt;/strong&gt; Using fresh Phoenix and Rails apps, let’s add a &lt;code class=&quot;highlighter-rouge&quot;&gt;users&lt;/code&gt; table that has a single column, &lt;code class=&quot;highlighter-rouge&quot;&gt;email&lt;/code&gt;. Using the built in generators will help show how minimal the tweaking required is.&lt;/p&gt;
+<p><strong>Example:</strong> Using fresh Phoenix and Rails apps, let’s add a <code class="language-plaintext highlighter-rouge">users</code> table that has a single column, <code class="language-plaintext highlighter-rouge">email</code>. Using the built in generators will help show how minimal the tweaking required is.</p>
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Phoenix&lt;/span&gt;
-mix phx.gen.html Accounts User &lt;span class=&quot;nb&quot;&gt;users &lt;/span&gt;email:string
-&lt;span class=&quot;c&quot;&gt;# Phoenix doesn't accept :citext as a valid type for the generator, so we will use :string here. &lt;/span&gt;
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Phoenix</span>
+mix phx.gen.html Accounts User <span class="nb">users </span>email:string
+<span class="c"># Phoenix doesn't accept :citext as a valid type for the generator, so we will use :string here. </span>
 
-&lt;span class=&quot;c&quot;&gt;# Rails&lt;/span&gt;
-bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rails generate model User email:citext
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<span class="c"># Rails</span>
+bundle <span class="nb">exec </span>rails generate model User email:citext
+</code></pre></div></div>
 
-&lt;p&gt;After running the generators, here’s the tweaks needed for both Phoenix and Rails:&lt;/p&gt;
+<p>After running the generators, here’s the tweaks needed for both Phoenix and Rails:</p>
 
-&lt;div class=&quot;language-diff highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# priv/repo/migrations/20190416235625_create_users.exs
-
-  use Ecto.Migration
-
-  def change do
-&lt;span class=&quot;gi&quot;&gt;+   execute &quot;CREATE EXTENSION IF NOT EXISTS citext&quot;,  &quot;DROP EXTENSION IF EXISTS citext&quot;
-&lt;/span&gt;    create table(:users) do
-&lt;span class=&quot;gd&quot;&gt;-     add :email, :string
-&lt;/span&gt;&lt;span class=&quot;gi&quot;&gt;+     add :email, :citext
-&lt;/span&gt;
-      timestamps()
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code># priv/repo/migrations/20190416235625_create_users.exs
+<span class="err">
+</span>  use Ecto.Migration
+<span class="err">
+</span>  def change do
+<span class="gi">+   execute "CREATE EXTENSION IF NOT EXISTS citext",  "DROP EXTENSION IF EXISTS citext"
+</span>    create table(:users) do
+<span class="gd">-     add :email, :string
+</span><span class="gi">+     add :email, :citext
+</span><span class="err">
+</span>      timestamps()
     end
-&lt;span class=&quot;gi&quot;&gt;+   create index(:users, [:email], unique: true)
-&lt;/span&gt;
-  end
-
-# db/migrate/20190416235153_create_users.rb
-
-  def change
-&lt;span class=&quot;gi&quot;&gt;+   enable_extension(:citext)
-&lt;/span&gt;    create_table :users do |t|
+<span class="gi">+   create index(:users, [:email], unique: true)
+</span><span class="err">
+</span>  end
+<span class="err">
+</span># db/migrate/20190416235153_create_users.rb
+<span class="err">
+</span>  def change
+<span class="gi">+   enable_extension(:citext)
+</span>    create_table :users do |t|
       t.citext :email
-&lt;span class=&quot;gi&quot;&gt;+     t.index :email, unique: true
-&lt;/span&gt;
-      t.timestamps
+<span class="gi">+     t.index :email, unique: true
+</span><span class="err">
+</span>      t.timestamps
     end
+<span class="err">
+</span></code></pre></div></div>
 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<p>Now it’s ready to go! Let’s run the migrations and add some tests to verify it works.</p>
 
-&lt;p&gt;Now it’s ready to go! Let’s run the migrations and add some tests to verify it works.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Phoenix&lt;/span&gt;
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Phoenix</span>
 mix ecto.migrate
 
-&lt;span class=&quot;c&quot;&gt;# Rails&lt;/span&gt;
-bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rails db.migrate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<span class="c"># Rails</span>
+bundle <span class="nb">exec </span>rails db.migrate
+</code></pre></div></div>
 
-&lt;p&gt;Couple quick tests to double check.&lt;/p&gt;
+<p>Couple quick tests to double check.</p>
 
-&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# test/my_app/accounts/accounts_test.exs&lt;/span&gt;
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/accounts/accounts_test.exs</span>
 
-&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;AccountsTest&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;users&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;can't duplicate case insensitive emails&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ASDF@example.com&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Accounts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Ecto&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Changeset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;errors:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;has already been taken&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]}&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Accounts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)})&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">AccountsTest</span> <span class="k">do</span>
+  <span class="c1"># ...</span>
+  <span class="n">describe</span> <span class="s2">"users"</span> <span class="k">do</span>
+    <span class="c1"># ...</span>
+    <span class="n">test</span> <span class="s2">"can't duplicate case insensitive emails"</span> <span class="k">do</span>
+      <span class="n">email</span> <span class="o">=</span> <span class="s2">"ASDF@example.com"</span>
+      <span class="n">user</span> <span class="o">=</span> <span class="no">Accounts</span><span class="o">.</span><span class="n">create_user</span><span class="p">(%{</span><span class="ss">email:</span> <span class="n">email</span><span class="p">})</span>
+      <span class="n">assert</span> <span class="p">{</span><span class="ss">:error</span><span class="p">,</span> <span class="p">%</span><span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span><span class="p">{</span><span class="ss">errors:</span> <span class="p">[</span><span class="ss">email:</span> <span class="p">{</span><span class="s2">"has already been taken"</span><span class="p">,</span> <span class="n">_</span><span class="p">}]}</span> <span class="p">}</span> <span class="o">=</span> <span class="no">Accounts</span><span class="o">.</span><span class="n">create_user</span><span class="p">(%{</span><span class="ss">email:</span> <span class="no">String</span><span class="o">.</span><span class="n">downcase</span><span class="p">(</span><span class="n">email</span><span class="p">)})</span>
+    <span class="k">end</span>
+    <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></div></div>
 
-&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# test/models/user_test.rb&lt;/span&gt;
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/models/user_test.rb</span>
 
-&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;UserTest&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;ActiveSupport&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;TestCase&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;setup&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ASDF@example.com&quot;&lt;/span&gt;
-    &lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;looks up case insensitive email&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;assert_equal&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;find_by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;can't duplicate case insensitive emails&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# DB constraint will raise an error&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;assert_raise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ActiveRecord&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;RecordNotUnique&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+<span class="k">class</span> <span class="nc">UserTest</span> <span class="o">&lt;</span> <span class="no">ActiveSupport</span><span class="o">::</span><span class="no">TestCase</span>
+  <span class="n">setup</span> <span class="k">do</span>
+    <span class="vi">@email</span> <span class="o">=</span> <span class="s2">"ASDF@example.com"</span>
+    <span class="vi">@user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="nb">test</span> <span class="s2">"looks up case insensitive email"</span> <span class="k">do</span>
+    <span class="n">assert_equal</span> <span class="vi">@user</span><span class="p">,</span> <span class="no">User</span><span class="p">.</span><span class="nf">find_by</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">.</span><span class="nf">downcase</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="nb">test</span> <span class="s2">"can't duplicate case insensitive emails"</span> <span class="k">do</span>
+    <span class="c1"># DB constraint will raise an error</span>
+    <span class="n">assert_raise</span><span class="p">(</span><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">RecordNotUnique</span><span class="p">)</span> <span class="p">{</span> <span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">.</span><span class="nf">downcase</span><span class="p">)</span> <span class="p">}</span>
 
-    &lt;span class=&quot;c1&quot;&gt;# validates_uniqueness_of will return a user object which is not persisted to the DB, and has an error on it&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;assert_equal&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;has already been taken&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;create&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;email: &lt;/span&gt;&lt;span class=&quot;vi&quot;&gt;@email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;downcase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;errors&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;messages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:email&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;Note about the Rails tests:&lt;/strong&gt; When using &lt;code class=&quot;highlighter-rouge&quot;&gt;validates_uniqueness_of&lt;/code&gt;, ActiveSupport will return an unpersisted model object, which includes the validation errors. Therefore, we use one assertion when relying on Postgres and a different assertion when using the validation helper. Because there are varying opinions on using &lt;code class=&quot;highlighter-rouge&quot;&gt;validates_uniqueness_of&lt;/code&gt;, I’ve included both examples.&lt;/p&gt;
+    <span class="c1"># validates_uniqueness_of will return a user object which is not persisted to the DB, and has an error on it</span>
+    <span class="n">assert_equal</span> <span class="p">[</span><span class="s2">"has already been taken"</span><span class="p">],</span> <span class="no">User</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">email: </span><span class="vi">@email</span><span class="p">.</span><span class="nf">downcase</span><span class="p">).</span><span class="nf">errors</span><span class="p">.</span><span class="nf">messages</span><span class="p">[</span><span class="ss">:email</span><span class="p">]</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p><strong>Note about the Rails tests:</strong> When using <code class="language-plaintext highlighter-rouge">validates_uniqueness_of</code>, ActiveSupport will return an unpersisted model object, which includes the validation errors. Therefore, we use one assertion when relying on Postgres and a different assertion when using the validation helper. Because there are varying opinions on using <code class="language-plaintext highlighter-rouge">validates_uniqueness_of</code>, I’ve included both examples.</p>
 
-&lt;p&gt;&lt;strong&gt;Summary:&lt;/strong&gt; Using &lt;code class=&quot;highlighter-rouge&quot;&gt;citext&lt;/code&gt; makes things easier for us. We don’t have to worry about character case or data integrity, it’s just automatically handled for us. Actual code for the Phoenix example is available on the &lt;a href=&quot;https://github.com/phoffer/phoenix_examples/tree/citext&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;citext&lt;/code&gt; branch of my phoenix_examples repo on Github&lt;/a&gt;.&lt;/p&gt;</content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="ruby" /><category term="rails" /><category term="postgis" /><summary type="html">TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.</summary></entry><entry><title type="html">Easy Session Testing in Phoenix and Plug</title><link href="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="alternate" type="text/html" title="Easy Session Testing in Phoenix and Plug" /><published>2018-03-22T00:00:00-07:00</published><updated>2018-03-22T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug</id><content type="html" xml:base="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html">&lt;p&gt;Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (&lt;a href=&quot;#older-approaches&quot;&gt;see below&lt;/a&gt;). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the &lt;a href=&quot;https://hexdocs.pm/plug/Plug.Test.html#init_test_session/2&quot;&gt;Plug docs&lt;/a&gt;, it is not in the Phoenix guides or most online resources. The only place I’ve seen it referenced is far down a &lt;a href=&quot;https://github.com/phoenixframework/phoenix/issues/861#issuecomment-294711607&quot;&gt;Github issue&lt;/a&gt;.&lt;/p&gt;
+<p><strong>Summary:</strong> Using <code class="language-plaintext highlighter-rouge">citext</code> makes things easier for us. We don’t have to worry about character case or data integrity, it’s just automatically handled for us. Actual code for the Phoenix example is available on the <a href="https://github.com/phoffer/phoenix_examples/tree/citext"><code class="language-plaintext highlighter-rouge">citext</code> branch of my phoenix_examples repo on Github</a>.</p>]]></content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="ruby" /><category term="rails" /><category term="postgis" /><summary type="html"><![CDATA[TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.]]></summary></entry><entry><title type="html">Easy Session Testing in Phoenix and Plug</title><link href="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="alternate" type="text/html" title="Easy Session Testing in Phoenix and Plug" /><published>2018-03-22T00:00:00-07:00</published><updated>2018-03-22T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug</id><content type="html" xml:base="https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html"><![CDATA[<p>Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (<a href="#older-approaches">see below</a>). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the <a href="https://hexdocs.pm/plug/Plug.Test.html#init_test_session/2">Plug docs</a>, it is not in the Phoenix guides or most online resources. The only place I’ve seen it referenced is far down a <a href="https://github.com/phoenixframework/phoenix/issues/861#issuecomment-294711607">Github issue</a>.</p>
 
-&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;no&quot;&gt;Plug&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init_test_session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;current_user_id:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Plug</span><span class="o">.</span><span class="no">Test</span><span class="o">.</span><span class="n">init_test_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">current_user_id:</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
 
-&lt;p&gt;&lt;strong&gt;That’s it!&lt;/strong&gt;&lt;/p&gt;
+<p><strong>That’s it!</strong></p>
 
-&lt;p&gt;There are a couple ways to utilize this. Let’s take an autogenerated controller test:&lt;/p&gt;
+<p>There are a couple ways to utilize this. Let’s take an autogenerated controller test:</p>
 
-&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;index&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;lists all users&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;conn:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;admin_user_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;html_response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=~&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Listing Users&quot;&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"index"</span> <span class="k">do</span>
+  <span class="n">test</span> <span class="s2">"lists all users"</span><span class="p">,</span> <span class="p">%{</span><span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span> <span class="k">do</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">get</span> <span class="n">conn</span><span class="p">,</span> <span class="n">admin_user_path</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">:index</span><span class="p">)</span>
+    <span class="n">assert</span> <span class="n">html_response</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">=~</span> <span class="s2">"Listing Users"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
 
-&lt;p&gt;To set session just for this test, we just have to add one line:&lt;/p&gt;
+<p>To set session just for this test, we just have to add one line:</p>
 
-&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;index&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;lists all users&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;conn:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# this could be streamlined using pipes |&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Plug&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init_test_session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;current_user_id:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;admin_user_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;html_response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=~&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Listing Users&quot;&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">describe</span> <span class="s2">"index"</span> <span class="k">do</span>
+  <span class="n">test</span> <span class="s2">"lists all users"</span><span class="p">,</span> <span class="p">%{</span><span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span> <span class="k">do</span>
+    <span class="c1"># this could be streamlined using pipes |&gt;</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="no">Plug</span><span class="o">.</span><span class="no">Test</span><span class="o">.</span><span class="n">init_test_session</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">current_user_id:</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">get</span> <span class="n">conn</span><span class="p">,</span> <span class="n">admin_user_path</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="ss">:index</span><span class="p">)</span>
+    <span class="n">assert</span> <span class="n">html_response</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">=~</span> <span class="s2">"Listing Users"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
 
-&lt;p&gt;If we wanted to set a session value for an entire set of controller tests, that’s simple too. We just need to add one block in the test:&lt;/p&gt;
+<p>If we wanted to set a session value for an entire set of controller tests, that’s simple too. We just need to add one block in the test:</p>
 
-&lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyAppWeb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;UserControllerTest&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;kn&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyAppWeb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ConnCase&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;User&lt;/span&gt;
+<div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">defmodule</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">UserControllerTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">ConnCase</span>
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">User</span>
 
-  &lt;span class=&quot;c1&quot;&gt;# ... add the following block:&lt;/span&gt;
+  <span class="c1"># ... add the following block:</span>
 
-  &lt;span class=&quot;n&quot;&gt;setup&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;conn:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;
-      &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Plug&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init_test_session&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;current_user_id:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;conn:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# ... rest of tests will now have that session value&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+  <span class="n">setup</span> <span class="p">%{</span><span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span> <span class="k">do</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">conn</span>
+      <span class="o">|&gt;</span> <span class="no">Plug</span><span class="o">.</span><span class="no">Test</span><span class="o">.</span><span class="n">init_test_session</span><span class="p">(</span><span class="ss">current_user_id:</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="ss">conn:</span> <span class="n">conn</span><span class="p">}</span>
+  <span class="k">end</span>
+  <span class="c1"># ... rest of tests will now have that session value</span>
+<span class="k">end</span>
+</code></pre></div></div>
 
-&lt;p&gt;Now, the &lt;code class=&quot;highlighter-rouge&quot;&gt;conn&lt;/code&gt; struct used for all the tests will have &lt;code class=&quot;highlighter-rouge&quot;&gt;current_user_id: 1&lt;/code&gt; set in session, as expected. This is a huge improvement, since it removes the complexity and ambiguity of previous ways to accomplish testing session data.&lt;/p&gt;
+<p>Now, the <code class="language-plaintext highlighter-rouge">conn</code> struct used for all the tests will have <code class="language-plaintext highlighter-rouge">current_user_id: 1</code> set in session, as expected. This is a huge improvement, since it removes the complexity and ambiguity of previous ways to accomplish testing session data.</p>
 
-&lt;h3 id=&quot;older-approaches&quot;&gt;Older approaches&lt;/h3&gt;
+<h3 id="older-approaches">Older approaches</h3>
 
-&lt;p&gt;There are quite a few older approaches, most of which are more complex approaches which may not work in all situations. Typically, they require either &lt;a href=&quot;https://gist.github.com/tsubery/2e7d118a51702c1e24741b9e2d9dfdbf&quot;&gt;customizing the &lt;code class=&quot;highlighter-rouge&quot;&gt;conn&lt;/code&gt; used in tests&lt;/a&gt; or by using &lt;a href=&quot;https://stackoverflow.com/a/31983168/366051&quot;&gt;tags paired with custom connection setup&lt;/a&gt;. Sometimes, this includes &lt;a href=&quot;https://elixirforum.com/t/test-for-sessions-in-phoenix/2569&quot;&gt;bypassing pipelines&lt;/a&gt;. There are other ways which include tweaking your app’s pipelines(&lt;a href=&quot;https://stackoverflow.com/a/42348255/366051&quot;&gt;1&lt;/a&gt;, &lt;a href=&quot;https://stackoverflow.com/a/38173072/366051&quot;&gt;2&lt;/a&gt;) and &lt;a href=&quot;http://work.stevegrossi.com/2016/06/02/testing-current-user-in-a-phoenix-app-the-easy-way/&quot;&gt;setting &lt;code class=&quot;highlighter-rouge&quot;&gt;current_user&lt;/code&gt; directly&lt;/a&gt;.&lt;/p&gt;
+<p>There are quite a few older approaches, most of which are more complex approaches which may not work in all situations. Typically, they require either <a href="https://gist.github.com/tsubery/2e7d118a51702c1e24741b9e2d9dfdbf">customizing the <code class="language-plaintext highlighter-rouge">conn</code> used in tests</a> or by using <a href="https://stackoverflow.com/a/31983168/366051">tags paired with custom connection setup</a>. Sometimes, this includes <a href="https://elixirforum.com/t/test-for-sessions-in-phoenix/2569">bypassing pipelines</a>. There are other ways which include tweaking your app’s pipelines(<a href="https://stackoverflow.com/a/42348255/366051">1</a>, <a href="https://stackoverflow.com/a/38173072/366051">2</a>) and <a href="http://work.stevegrossi.com/2016/06/02/testing-current-user-in-a-phoenix-app-the-easy-way/">setting <code class="language-plaintext highlighter-rouge">current_user</code> directly</a>.</p>
 
-&lt;p&gt;To be clear, all of these approaches work, and have been necessary in the past. But luckily, &lt;a href=&quot;https://github.com/elixir-plug/plug/commit/1c1b1b41b0b9f535847862d7804f7194d0f0379d&quot;&gt;Plug 1.5 added&lt;/a&gt; made this all much simpler.&lt;/p&gt;</content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="phoenix" /><category term="plug" /><summary type="html">Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (see below). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the Plug docs, it is not in the Phoenix guides or most online resources. The only place I’ve seen it referenced is far down a Github issue.</summary></entry><entry><title type="html">Simple Setup of PostGIS Columns with Phoenix Generators</title><link href="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="alternate" type="text/html" title="Simple Setup of PostGIS Columns with Phoenix Generators" /><published>2018-03-03T00:00:00-07:00</published><updated>2018-03-03T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators</id><content type="html" xml:base="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html">&lt;p&gt;How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.&lt;/p&gt;
+<p>To be clear, all of these approaches work, and have been necessary in the past. But luckily, <a href="https://github.com/elixir-plug/plug/commit/1c1b1b41b0b9f535847862d7804f7194d0f0379d">Plug 1.5 added</a> made this all much simpler.</p>]]></content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="phoenix" /><category term="plug" /><summary type="html"><![CDATA[Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has traditionally been tedious in Elixir (see below). However, Plug has recently added functionality to make this very simple. It’s a relatively new feature and not very well documented online. While it is in the Plug docs, it is not in the Phoenix guides or most online resources. The only place I’ve seen it referenced is far down a Github issue.]]></summary></entry><entry><title type="html">Simple Setup of PostGIS Columns with Phoenix Generators</title><link href="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="alternate" type="text/html" title="Simple Setup of PostGIS Columns with Phoenix Generators" /><published>2018-03-03T00:00:00-07:00</published><updated>2018-03-03T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators</id><content type="html" xml:base="https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html"><![CDATA[<p>How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.</p>
 
-&lt;p&gt;&lt;strong&gt;Requirement:&lt;/strong&gt; I need to create a schema that includes a PostGIS Point columm.&lt;/p&gt;
+<p><strong>Requirement:</strong> I need to create a schema that includes a PostGIS Point columm.</p>
 
-&lt;p&gt;&lt;strong&gt;Problem:&lt;/strong&gt; Phoenix generators are great, but they don’t support special types, such as PostGIS columns.&lt;/p&gt;
+<p><strong>Problem:</strong> Phoenix generators are great, but they don’t support special types, such as PostGIS columns.</p>
 
-&lt;p&gt;The docs for &lt;a href=&quot;https://github.com/bryanjos/geo_postgis&quot;&gt;geo_postgis&lt;/a&gt; are sufficient for figuring out how to work with geographic data types, but they don’t cover how to make it work with Phoenix generators, changesets, or tests.&lt;/p&gt;
+<p>The docs for <a href="https://github.com/bryanjos/geo_postgis">geo_postgis</a> are sufficient for figuring out how to work with geographic data types, but they don’t cover how to make it work with Phoenix generators, changesets, or tests.</p>
 
-&lt;p&gt;&lt;strong&gt;Goal:&lt;/strong&gt; Use Phoenix generators (since contexts are too useful to ignore), and have the generated changesets, views, and tests work with only minor tweaks.&lt;/p&gt;
+<p><strong>Goal:</strong> Use Phoenix generators (since contexts are too useful to ignore), and have the generated changesets, views, and tests work with only minor tweaks.</p>
 
-&lt;p&gt;&lt;strong&gt;How:&lt;/strong&gt; Use virtual attributes in the Ecto schema to be the bridge to the custom type.&lt;/p&gt;
+<p><strong>How:</strong> Use virtual attributes in the Ecto schema to be the bridge to the custom type.</p>
 
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;First step is to plan out what type of data you will have, and what primitives it is composed of.&lt;/p&gt;
+<ol>
+  <li>
+    <p>First step is to plan out what type of data you will have, and what primitives it is composed of.</p>
 
-    &lt;p&gt;In this case, a &lt;code class=&quot;highlighter-rouge&quot;&gt;Point&lt;/code&gt; has 2 floats, representing latitude and longitude. Most interaction will be with the float values instead of the &lt;code class=&quot;highlighter-rouge&quot;&gt;Geo.Point&lt;/code&gt; struct. These 2 floats will become virtual attributes to our schema struct.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Use the virtual attributes in our generator.&lt;/p&gt;
+    <p>In this case, a <code class="language-plaintext highlighter-rouge">Point</code> has 2 floats, representing latitude and longitude. Most interaction will be with the float values instead of the <code class="language-plaintext highlighter-rouge">Geo.Point</code> struct. These 2 floats will become virtual attributes to our schema struct.</p>
+  </li>
+  <li>
+    <p>Use the virtual attributes in our generator.</p>
 
-    &lt;p&gt;For a &lt;code class=&quot;highlighter-rouge&quot;&gt;Admin&lt;/code&gt; context and a &lt;code class=&quot;highlighter-rouge&quot;&gt;locations&lt;/code&gt; table, our generator command will look like this:&lt;/p&gt;
+    <p>For a <code class="language-plaintext highlighter-rouge">Admin</code> context and a <code class="language-plaintext highlighter-rouge">locations</code> table, our generator command will look like this:</p>
 
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mix phx.gen.html Admin Location locations lng:float lat:float &lt;span class=&quot;c&quot;&gt;# ... other columns&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mix phx.gen.html Admin Location locations lng:float lat:float <span class="c"># ... other columns</span>
+</code></pre></div>    </div>
 
-    &lt;p&gt;There are still a few steps before this works and tests are passing. The migration, schema, and tests need updating.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Fix the migration to create the proper column (&lt;code class=&quot;highlighter-rouge&quot;&gt;coordinates&lt;/code&gt;).&lt;/p&gt;
+    <p>There are still a few steps before this works and tests are passing. The migration, schema, and tests need updating.</p>
+  </li>
+  <li>
+    <p>Fix the migration to create the proper column (<code class="language-plaintext highlighter-rouge">coordinates</code>).</p>
 
-    &lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Repo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Migrations&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CreateLocations&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;kn&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Ecto&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Migration&lt;/span&gt;
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Repo</span><span class="o">.</span><span class="no">Migrations</span><span class="o">.</span><span class="no">CreateLocations</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Migration</span>
 
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;change&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;create&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:locations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;# remove the lines for lat/lng. They are commented here to show which lines&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;# add :lat, :float&lt;/span&gt;
-      &lt;span class=&quot;c1&quot;&gt;# add :lng, :float&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  <span class="k">def</span> <span class="n">change</span> <span class="k">do</span>
+    <span class="n">create</span> <span class="n">table</span><span class="p">(</span><span class="ss">:locations</span><span class="p">)</span> <span class="k">do</span>
+      <span class="c1"># remove the lines for lat/lng. They are commented here to show which lines</span>
+      <span class="c1"># add :lat, :float</span>
+      <span class="c1"># add :lng, :float</span>
+    <span class="k">end</span>
 
-&lt;span class=&quot;c1&quot;&gt;# add the next line, which creates a column `coordinates` on table `locations`&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;SELECT AddGeometryColumn ('locations','coordinates',4326,'POINT',2);&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# add an index if necessary&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;create&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:locations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:coordinates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;using:&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:gist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Update the generated schema:&lt;/p&gt;
+<span class="c1"># add the next line, which creates a column `coordinates` on table `locations`</span>
+    <span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT AddGeometryColumn ('locations','coordinates',4326,'POINT',2);"</span><span class="p">)</span>
+<span class="c1"># add an index if necessary</span>
+    <span class="n">create</span> <span class="n">index</span><span class="p">(</span><span class="ss">:locations</span><span class="p">,</span> <span class="p">[</span><span class="ss">:coordinates</span><span class="p">],</span> <span class="ss">using:</span> <span class="ss">:gist</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Update the generated schema:</p>
 
-    &lt;p&gt;Find &lt;code class=&quot;highlighter-rouge&quot;&gt;lib/my_app/admin/locations.ex&lt;/code&gt; to make the &lt;code class=&quot;highlighter-rouge&quot;&gt;lat&lt;/code&gt;/&lt;code class=&quot;highlighter-rouge&quot;&gt;lng&lt;/code&gt; columns virtual, add the &lt;code class=&quot;highlighter-rouge&quot;&gt;coordinates&lt;/code&gt; column, and cast &lt;code class=&quot;highlighter-rouge&quot;&gt;lat&lt;/code&gt;/&lt;code class=&quot;highlighter-rouge&quot;&gt;lng&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;coordinates&lt;/code&gt;&lt;/p&gt;
+    <p>Find <code class="language-plaintext highlighter-rouge">lib/my_app/admin/locations.ex</code> to make the <code class="language-plaintext highlighter-rouge">lat</code>/<code class="language-plaintext highlighter-rouge">lng</code> columns virtual, add the <code class="language-plaintext highlighter-rouge">coordinates</code> column, and cast <code class="language-plaintext highlighter-rouge">lat</code>/<code class="language-plaintext highlighter-rouge">lng</code> to <code class="language-plaintext highlighter-rouge">coordinates</code></p>
 
-    &lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Location&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;kn&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Ecto&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Schema&lt;/span&gt;
-  &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Ecto&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Changeset&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Location&lt;/span&gt;
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Admin</span><span class="o">.</span><span class="no">Location</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Schema</span>
+  <span class="kn">import</span> <span class="no">Ecto</span><span class="o">.</span><span class="no">Changeset</span>
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Admin</span><span class="o">.</span><span class="no">Location</span>
 
-  &lt;span class=&quot;n&quot;&gt;schema&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;locations&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:coordinates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Geo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Point&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;# add the actual column&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lng&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;virtual:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# add the virtual flag here and below&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;virtual:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  <span class="n">schema</span> <span class="s2">"locations"</span> <span class="k">do</span>
+    <span class="n">field</span> <span class="ss">:coordinates</span><span class="p">,</span> <span class="no">Geo</span><span class="o">.</span><span class="no">Point</span>     <span class="c1"># add the actual column</span>
+    <span class="n">field</span> <span class="ss">:lng</span><span class="p">,</span> <span class="ss">:float</span><span class="p">,</span> <span class="ss">virtual:</span> <span class="no">true</span> <span class="c1"># add the virtual flag here and below</span>
+    <span class="n">field</span> <span class="ss">:lat</span><span class="p">,</span> <span class="ss">:float</span><span class="p">,</span> <span class="ss">virtual:</span> <span class="no">true</span>
+  <span class="k">end</span>
 
-  &lt;span class=&quot;nv&quot;&gt;@doc&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;changeset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cast&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:lng&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;validate_required&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:lng&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cast_coordinates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;# remember to cast the coordinates!&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  <span class="nv">@doc</span> <span class="no">false</span>
+  <span class="k">def</span> <span class="n">changeset</span><span class="p">(%</span><span class="no">Location</span><span class="p">{}</span> <span class="o">=</span> <span class="n">location</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">location</span>
+    <span class="o">|&gt;</span> <span class="n">cast</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="p">[</span><span class="ss">:lng</span><span class="p">,</span> <span class="ss">:lat</span><span class="p">])</span>
+    <span class="o">|&gt;</span> <span class="n">validate_required</span><span class="p">([</span><span class="ss">:lng</span><span class="p">,</span> <span class="ss">:lat</span><span class="p">])</span>
+    <span class="o">|&gt;</span> <span class="n">cast_coordinates</span><span class="p">()</span>        <span class="c1"># remember to cast the coordinates!</span>
+  <span class="k">end</span>
 
-  &lt;span class=&quot;c1&quot;&gt;# something like this to cast the virtual columns to actual column&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# it would be good to add validation but I've left it out for brevity&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cast_coordinates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;changeset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;lat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_change&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;changeset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;lng&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_change&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;changeset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:lng&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;geo&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Geo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;coordinates:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lng&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;srid:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4326&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;changeset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;put_change&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:coordinates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;geo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Update the generated tests:&lt;/p&gt;
+  <span class="c1"># something like this to cast the virtual columns to actual column</span>
+  <span class="c1"># it would be good to add validation but I've left it out for brevity</span>
+  <span class="k">def</span> <span class="n">cast_coordinates</span><span class="p">(</span><span class="n">changeset</span><span class="p">)</span> <span class="k">do</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">get_change</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="ss">:lat</span><span class="p">)</span>
+    <span class="n">lng</span> <span class="o">=</span> <span class="n">get_change</span><span class="p">(</span><span class="n">changeset</span><span class="p">,</span> <span class="ss">:lng</span><span class="p">)</span>
+    <span class="n">geo</span> <span class="o">=</span> <span class="p">%</span><span class="no">Geo</span><span class="o">.</span><span class="no">Point</span><span class="p">{</span><span class="ss">coordinates:</span> <span class="p">{</span><span class="n">lng</span><span class="p">,</span> <span class="n">lat</span><span class="p">},</span> <span class="ss">srid:</span> <span class="mi">4326</span><span class="p">}</span>
+    <span class="n">changeset</span> <span class="o">|&gt;</span> <span class="n">put_change</span><span class="p">(</span><span class="ss">:coordinates</span><span class="p">,</span> <span class="n">geo</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Update the generated tests:</p>
 
-    &lt;p&gt;Find &lt;code class=&quot;highlighter-rouge&quot;&gt;test/my_app/admin/admin_test.exs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;test/my_app/controllers/location_controller_test.exs&lt;/code&gt;. These tests must be updated to check the &lt;code class=&quot;highlighter-rouge&quot;&gt;coordinates&lt;/code&gt; attribute instead of &lt;code class=&quot;highlighter-rouge&quot;&gt;lat&lt;/code&gt;/&lt;code class=&quot;highlighter-rouge&quot;&gt;lng&lt;/code&gt; attributes.&lt;/p&gt;
+    <p>Find <code class="language-plaintext highlighter-rouge">test/my_app/admin/admin_test.exs</code> and <code class="language-plaintext highlighter-rouge">test/my_app/controllers/location_controller_test.exs</code>. These tests must be updated to check the <code class="language-plaintext highlighter-rouge">coordinates</code> attribute instead of <code class="language-plaintext highlighter-rouge">lat</code>/<code class="language-plaintext highlighter-rouge">lng</code> attributes.</p>
 
-    &lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# test/my_app/controllers/location_controller_test.exs&lt;/span&gt;
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/controllers/location_controller_test.exs</span>
    
-&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyAppWeb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;LocationControllerTest&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;kn&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyAppWeb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;ConnCase&lt;/span&gt;
+<span class="k">defmodule</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">LocationControllerTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">MyAppWeb</span><span class="o">.</span><span class="no">ConnCase</span>
    
-  &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Admin</span>
    
-  &lt;span class=&quot;nv&quot;&gt;@create_attrs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;60.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;70.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# ensure that valid values are used&lt;/span&gt;
-  &lt;span class=&quot;nv&quot;&gt;@update_attrs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;45.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;56.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# ensure that valid values are used&lt;/span&gt;
-  &lt;span class=&quot;nv&quot;&gt;@invalid_attrs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# use invalid values here&lt;/span&gt;
+  <span class="nv">@create_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="mf">60.5</span><span class="p">,</span> <span class="ss">lng:</span> <span class="mf">70.5</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+  <span class="nv">@update_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="mf">45.7</span><span class="p">,</span> <span class="ss">lng:</span> <span class="mf">56.7</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+  <span class="nv">@invalid_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="mi">200</span><span class="p">,</span> <span class="ss">lng:</span> <span class="mi">200</span><span class="p">}</span>  <span class="c1"># use invalid values here</span>
    
-  &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;div class=&quot;language-elixir highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# test/my_app/admin/admin_test.exs&lt;/span&gt;
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre></div>    </div>
+    <div class="language-elixir highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test/my_app/admin/admin_test.exs</span>
    
-&lt;span class=&quot;k&quot;&gt;defmodule&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;AdminTest&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-  &lt;span class=&quot;kn&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;DataCase&lt;/span&gt;
+<span class="k">defmodule</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">AdminTest</span> <span class="k">do</span>
+  <span class="kn">use</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">DataCase</span>
    
-  &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;
+  <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Admin</span>
    
-  &lt;span class=&quot;n&quot;&gt;describe&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;locations&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;MyApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Location&lt;/span&gt;
+  <span class="n">describe</span> <span class="s2">"locations"</span> <span class="k">do</span>
+    <span class="n">alias</span> <span class="no">MyApp</span><span class="o">.</span><span class="no">Admin</span><span class="o">.</span><span class="no">Location</span>
    
-    &lt;span class=&quot;nv&quot;&gt;@create_attrs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;60.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;70.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# ensure that valid values are used&lt;/span&gt;
-    &lt;span class=&quot;nv&quot;&gt;@update_attrs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;45.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;56.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# ensure that valid values are used&lt;/span&gt;
-    &lt;span class=&quot;nv&quot;&gt;@invalid_attrs&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# use invalid values here&lt;/span&gt;
+    <span class="nv">@create_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="mf">60.5</span><span class="p">,</span> <span class="ss">lng:</span> <span class="mf">70.5</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+    <span class="nv">@update_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="mf">45.7</span><span class="p">,</span> <span class="ss">lng:</span> <span class="mf">56.7</span><span class="p">}</span> <span class="c1"># ensure that valid values are used</span>
+    <span class="nv">@invalid_attrs</span> <span class="p">%{</span><span class="ss">lat:</span> <span class="mi">200</span><span class="p">,</span> <span class="ss">lng:</span> <span class="mi">200</span><span class="p">}</span>  <span class="c1"># use invalid values here</span>
    
-  &lt;span class=&quot;c1&quot;&gt;# any test checking equality will need to reset the lat/lng attributes&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# generated test&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;list_locations/0 returns all locations&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location_fixture&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;list_locations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  <span class="c1"># any test checking equality will need to reset the lat/lng attributes</span>
+  <span class="c1"># generated test</span>
+    <span class="n">test</span> <span class="s2">"list_locations/0 returns all locations"</span> <span class="k">do</span>
+      <span class="n">location</span> <span class="o">=</span> <span class="n">location_fixture</span><span class="p">()</span>
+      <span class="n">assert</span> <span class="no">Admin</span><span class="o">.</span><span class="n">list_locations</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">location</span><span class="p">]</span>
+    <span class="k">end</span>
 
-  &lt;span class=&quot;c1&quot;&gt;# updated test&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;list_locations/0 returns all locations&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location_fixture&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lat:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;lng:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;list_locations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  <span class="c1"># updated test</span>
+    <span class="n">test</span> <span class="s2">"list_locations/0 returns all locations"</span> <span class="k">do</span>
+      <span class="n">location</span> <span class="o">=</span> <span class="p">%{</span> <span class="n">location_fixture</span><span class="p">()</span> <span class="o">|</span> <span class="ss">lat:</span> <span class="no">nil</span><span class="p">,</span> <span class="ss">lng:</span> <span class="no">nil</span><span class="p">}</span>
+      <span class="n">assert</span> <span class="no">Admin</span><span class="o">.</span><span class="n">list_locations</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="n">location</span><span class="p">]</span>
+    <span class="k">end</span>
    
-  &lt;span class=&quot;c1&quot;&gt;# for tests checking values, remove the assertions for lat/lng and add one for `coordinates`&lt;/span&gt;
-  &lt;span class=&quot;c1&quot;&gt;# generated test&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;create_location/1 with valid data creates a location&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;@valid_attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;60.5&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lng&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;70.5&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  <span class="c1"># for tests checking values, remove the assertions for lat/lng and add one for `coordinates`</span>
+  <span class="c1"># generated test</span>
+    <span class="n">test</span> <span class="s2">"create_location/1 with valid data creates a location"</span> <span class="k">do</span>
+      <span class="n">assert</span> <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="p">%</span><span class="no">Location</span><span class="p">{}</span> <span class="o">=</span> <span class="n">location</span><span class="p">}</span> <span class="o">=</span> <span class="no">Admin</span><span class="o">.</span><span class="n">create_location</span><span class="p">(</span><span class="nv">@valid_attrs</span><span class="p">)</span>
+      <span class="n">assert</span> <span class="n">location</span><span class="o">.</span><span class="n">lat</span> <span class="o">==</span> <span class="mf">60.5</span>
+      <span class="n">assert</span> <span class="n">location</span><span class="o">.</span><span class="n">lng</span> <span class="o">==</span> <span class="mf">70.5</span>
+    <span class="k">end</span>
 
-  &lt;span class=&quot;c1&quot;&gt;# updated test&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;test&lt;/span&gt; &lt;span class=&quot;sd&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;create_location/1 with valid data creates a location&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;@valid_attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;coordinates&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Geo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;coordinates:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;70.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;60.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;srid:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4326&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Run tests. Everything should be passing!&lt;/strong&gt;&lt;/p&gt;
+  <span class="c1"># updated test</span>
+    <span class="n">test</span> <span class="s2">"create_location/1 with valid data creates a location"</span> <span class="k">do</span>
+      <span class="n">assert</span> <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="p">%</span><span class="no">Location</span><span class="p">{}</span> <span class="o">=</span> <span class="n">location</span><span class="p">}</span> <span class="o">=</span> <span class="no">Admin</span><span class="o">.</span><span class="n">create_location</span><span class="p">(</span><span class="nv">@valid_attrs</span><span class="p">)</span>
+      <span class="n">assert</span> <span class="n">location</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">==</span> <span class="p">%</span><span class="no">Geo</span><span class="o">.</span><span class="no">Point</span><span class="p">{</span><span class="ss">coordinates:</span> <span class="p">{</span><span class="mf">70.5</span><span class="p">,</span> <span class="mf">60.5</span><span class="p">},</span> <span class="ss">srid:</span> <span class="mi">4326</span><span class="p">}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Run tests. Everything should be passing!</strong></p>
 
-    &lt;p&gt;Now go celebrate by adding some real functionality!&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;</content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="postgis" /><summary type="html">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.</summary></entry><entry><title type="html">Force git to treat Keynote files as binary</title><link href="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="alternate" type="text/html" title="Force git to treat Keynote files as binary" /><published>2016-09-21T00:00:00-07:00</published><updated>2016-09-21T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary</id><content type="html" xml:base="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html">&lt;p&gt;I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:&lt;/p&gt;
+    <p>Now go celebrate by adding some real functionality!</p>
+  </li>
+</ol>]]></content><author><name>Paul Hoffer</name></author><category term="elixir" /><category term="ecto" /><category term="phoenix" /><category term="postgis" /><summary type="html"><![CDATA[How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.]]></summary></entry><entry><title type="html">Force git to treat Keynote files as binary</title><link href="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="alternate" type="text/html" title="Force git to treat Keynote files as binary" /><published>2016-09-21T00:00:00-07:00</published><updated>2016-09-21T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary</id><content type="html" xml:base="https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html"><![CDATA[<p>I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:</p>
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git status
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git status
 ...
     new file:   presentation.key/Data/st-ED415AB1-F3E3-40E7-AE3C-62C8F48D61F2-1769.jpg
     new file:   presentation.key/Data/st-FA2A3A03-7617-4164-9E65-1304161A58D5-2058.jpg
@@ -314,24 +314,24 @@ bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;rails db.migrate
     new file:   presentation.key/preview-web.jpg
     new file:   presentation.key/preview.jpg
 ...
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;I just want the files there as binary, so that anyone can download them if they like.&lt;/p&gt;
+<p>I just want the files there as binary, so that anyone can download them if they like.</p>
 
-&lt;p&gt;I tried a few different things, including a &lt;code class=&quot;highlighter-rouge&quot;&gt;.gitattributes&lt;/code&gt; file with &lt;code class=&quot;highlighter-rouge&quot;&gt;*.key binary&lt;/code&gt;, using different versions of git, and even different versions of OS X (el Capitan and Sierra).&lt;/p&gt;
+<p>I tried a few different things, including a <code class="language-plaintext highlighter-rouge">.gitattributes</code> file with <code class="language-plaintext highlighter-rouge">*.key binary</code>, using different versions of git, and even different versions of OS X (el Capitan and Sierra).</p>
 
-&lt;p&gt;In the end, the problem was from when I had saved the presentations. The &lt;code class=&quot;highlighter-rouge&quot;&gt;hide file extension&lt;/code&gt; option in Keynote’s save dialog was the problem. De-selecting that option is all it took for it to work as I wanted (and as I think most people would expect).&lt;/p&gt;</content><author><name>Paul Hoffer</name></author><category term="osx" /><summary type="html">I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:</summary></entry><entry><title type="html">Smoothly upgrade did_you_mean gem for Ruby 2.3</title><link href="https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="alternate" type="text/html" title="Smoothly upgrade did_you_mean gem for Ruby 2.3" /><published>2016-03-04T00:00:00-07:00</published><updated>2016-03-04T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23</id><content type="html" xml:base="https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html">&lt;p&gt;A lot of Rails apps are using the gem &lt;code class=&quot;highlighter-rouge&quot;&gt;did_you_mean&lt;/code&gt; to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.&lt;/p&gt;
+<p>In the end, the problem was from when I had saved the presentations. The <code class="language-plaintext highlighter-rouge">hide file extension</code> option in Keynote’s save dialog was the problem. De-selecting that option is all it took for it to work as I wanted (and as I think most people would expect).</p>]]></content><author><name>Paul Hoffer</name></author><category term="osx" /><summary type="html"><![CDATA[I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directory, which ends up looking like this:]]></summary></entry><entry><title type="html">Smoothly upgrade did_you_mean gem for Ruby 2.3</title><link href="https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html" rel="alternate" type="text/html" title="Smoothly upgrade did_you_mean gem for Ruby 2.3" /><published>2016-03-04T00:00:00-07:00</published><updated>2016-03-04T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23</id><content type="html" xml:base="https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html"><![CDATA[<p>A lot of Rails apps are using the gem <code class="language-plaintext highlighter-rouge">did_you_mean</code> to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.</p>
 
-&lt;p&gt;A graceful method of upgrading Ruby is to update the Gemfile version of &lt;code class=&quot;highlighter-rouge&quot;&gt;did_you_mean&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;0.10.0&lt;/code&gt; if it wasn’t already. That version was released 4 months before Ruby 2.3, so some apps may already be using it. Version &lt;code class=&quot;highlighter-rouge&quot;&gt;0.10.0&lt;/code&gt; works with both 2.3 and previous versions.&lt;/p&gt;
+<p>A graceful method of upgrading Ruby is to update the Gemfile version of <code class="language-plaintext highlighter-rouge">did_you_mean</code> to <code class="language-plaintext highlighter-rouge">0.10.0</code> if it wasn’t already. That version was released 4 months before Ruby 2.3, so some apps may already be using it. Version <code class="language-plaintext highlighter-rouge">0.10.0</code> works with both 2.3 and previous versions.</p>
 
-&lt;p&gt;Fix came from &lt;a href=&quot;https://github.com/yuki24/did_you_mean/issues/61&quot;&gt;this Github issue&lt;/a&gt;&lt;/p&gt;</content><author><name>Paul Hoffer</name></author><category term="ruby" /><summary type="html">A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.</summary></entry><entry><title type="html">Getting Ghost onto Github Pages</title><link href="https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html" rel="alternate" type="text/html" title="Getting Ghost onto Github Pages" /><published>2016-02-20T00:00:00-07:00</published><updated>2016-02-20T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages</id><content type="html" xml:base="https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html">&lt;p&gt;Ghost seems great. Github Pages seem great. Getting those two together &lt;a href=&quot;http://blog.sunnyg.io/2015/09/24/ghost-with-github/&quot;&gt;seems&lt;/a&gt; &lt;a href=&quot;http://carlbernardo.github.io/setting-up-your-ghost-github-pages-blog/&quot;&gt;so&lt;/a&gt; &lt;a href=&quot;http://briank.im/i-see-ghosts/&quot;&gt;incredibly&lt;/a&gt; &lt;a href=&quot;http://www.willhackett.com/2015/11/13/slightly-late-halloween-post-how-to-host-ghost-on-github/&quot;&gt;simple&lt;/a&gt;. Oh but guess what, Buster isn’t maintained anymore and it 
-  &lt;a href=&quot;https://github.com/axitkhurana/buster/issues/43&quot;&gt;fails to generate the static version&lt;/a&gt; of an basic Ghost blog.&lt;/p&gt;
+<p>Fix came from <a href="https://github.com/yuki24/did_you_mean/issues/61">this Github issue</a></p>]]></content><author><name>Paul Hoffer</name></author><category term="ruby" /><summary type="html"><![CDATA[A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.]]></summary></entry><entry><title type="html">Getting Ghost onto Github Pages</title><link href="https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html" rel="alternate" type="text/html" title="Getting Ghost onto Github Pages" /><published>2016-02-20T00:00:00-07:00</published><updated>2016-02-20T00:00:00-07:00</updated><id>https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages</id><content type="html" xml:base="https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html"><![CDATA[<p>Ghost seems great. Github Pages seem great. Getting those two together <a href="http://blog.sunnyg.io/2015/09/24/ghost-with-github/">seems</a> <a href="http://carlbernardo.github.io/setting-up-your-ghost-github-pages-blog/">so</a> <a href="http://briank.im/i-see-ghosts/">incredibly</a> <a href="http://www.willhackett.com/2015/11/13/slightly-late-halloween-post-how-to-host-ghost-on-github/">simple</a>. Oh but guess what, Buster isn’t maintained anymore and it 
+  <a href="https://github.com/axitkhurana/buster/issues/43">fails to generate the static version</a> of an basic Ghost blog.</p>
 
-&lt;p&gt;Let’s assume that you have a Ghost blog working locally already, and now you’re just trying to deploy to GH pages.&lt;/p&gt;
+<p>Let’s assume that you have a Ghost blog working locally already, and now you’re just trying to deploy to GH pages.</p>
 
-&lt;p&gt;There’s a fork of Buster that fixes this problem. Install Buster from that fork (use the –update flag if you already have Buster installed):&lt;/p&gt;
+<p>There’s a fork of Buster that fixes this problem. Install Buster from that fork (use the –update flag if you already have Buster installed):</p>
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;https://github.com/thinkamabob/buster/archive/master.zip &lt;span class=&quot;nt&quot;&gt;--upgrade&lt;/span&gt;  
-buster generate &lt;span class=&quot;nt&quot;&gt;--domain&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://code.phoffer.com/  
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip <span class="nb">install </span>https://github.com/thinkamabob/buster/archive/master.zip <span class="nt">--upgrade</span>  
+buster generate <span class="nt">--domain</span><span class="o">=</span>https://code.phoffer.com/  
 Now you can host your blog on Github Pages. Congratulations!
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Paul Hoffer</name></author><summary type="html">Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it fails to generate the static version of an basic Ghost blog.</summary></entry></feed>
+</code></pre></div></div>]]></content><author><name>Paul Hoffer</name></author><summary type="html"><![CDATA[Ghost seems great. Github Pages seem great. Getting those two together seems so incredibly simple. Oh but guess what, Buster isn’t maintained anymore and it fails to generate the static version of an basic Ghost blog.]]></summary></entry></feed>

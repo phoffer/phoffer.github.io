@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
-  Minimal Mistakes Jekyll Theme 4.16.0 by Michael Rose
-  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
   Free for personal and commercial use under the MIT license
   https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
 -->
@@ -12,6 +12,11 @@
 <!-- begin _includes/seo.html --><title>Smoothly upgrade did_you_mean gem for Ruby 2.3 - Paul Hoffer</title>
 <meta name="description" content="A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.">
 
+
+  <meta name="author" content="Paul Hoffer">
+  
+  <meta property="article:author" content="Paul Hoffer">
+  
 
 
 <meta property="og:type" content="article">
@@ -41,8 +46,16 @@
 
 
 
-
-
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "https://www.paulhoffer.com/"
+    
+  }
+</script>
 
 
 
@@ -53,7 +66,9 @@
 <!-- end _includes/seo.html -->
 
 
-<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
+
 
 <!-- https://t.co/dKP3o1e -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,21 +79,8 @@
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="/assets/css/main.css">
-
-<!--[if IE ]>
-  <style>
-    /* old IE unsupported flexbox fixes */
-    .greedy-nav .site-title {
-      padding-right: 3em;
-    }
-    .greedy-nav button {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 100%;
-    }
-  </style>
-<![endif]-->
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
 
 
 
@@ -91,13 +93,15 @@
   </head>
 
   <body class="layout--single">
-
-    <!--[if lt IE 9]>
-<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
-<![endif]-->
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
 
     
-
 
     <div class="initial-content">
       
@@ -115,9 +119,6 @@
   
     <div class="author__avatar">
       
-
-      
-        
         <a href="/">
           <img src="/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
         </a>
@@ -130,15 +131,14 @@
       <a href="/"><h3 class="author__name" itemprop="name">Paul Hoffer</h3></a>
     
     
-      <p class="author__bio" itemprop="description">
-        Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects. I like to golf and run in my spare time.
-      </p>
+      <div class="author__bio" itemprop="description">
+        <p>Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects.</p>
+
+      </div>
     
   </div>
 
-
   <div class="author__urls-wrapper">
-    
     <button class="btn btn--inverse">Follow</button>
     <ul class="author__urls social-icons">
       
@@ -152,19 +152,13 @@
       
 
       
-        <li>
-          <a href="https://twitter.com/phoffer8" itemprop="sameAs" rel="nofollow noopener noreferrer">
-            <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
-          </a>
-        </li>
-      
 
       
 
       
         <li>
           <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
-            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
+            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span>
           </a>
         </li>
       
@@ -180,7 +174,7 @@
       
         <li>
           <a href="https://github.com/phoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
-            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
+            <i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span>
           </a>
         </li>
       
@@ -190,7 +184,7 @@
       
         <li>
           <a href="https://stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
-            <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i> Stack Overflow
+            <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span>
           </a>
         </li>
       
@@ -232,10 +226,11 @@
   </div>
 
 
+
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
     <meta itemprop="headline" content="Smoothly upgrade did_you_mean gem for Ruby 2.3">
     <meta itemprop="description" content="A lot of Rails apps are using the gem did_you_mean to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.">
-    <meta itemprop="datePublished" content="March 04, 2016">
+    <meta itemprop="datePublished" content="2016-03-04T00:00:00-07:00">
     
 
     <div class="page__inner-wrap">
@@ -244,22 +239,34 @@
           <h1 id="page-title" class="page__title" itemprop="headline">Smoothly upgrade did_you_mean gem for Ruby 2.3
 </h1>
           
-            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
+    
+  </p>
 
 
-
-
-  less than 1 minute read
-</p>
-          
         </header>
       
 
       <section class="page__content" itemprop="text">
         
-        <p>A lot of Rails apps are using the gem <code class="highlighter-rouge">did_you_mean</code> to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.</p>
+        <p>A lot of Rails apps are using the gem <code class="language-plaintext highlighter-rouge">did_you_mean</code> to help during development. Most of these apps are probably going to run into an issue when upgrading to Ruby 2.3, which pulled the gem into Ruby core.</p>
 
-<p>A graceful method of upgrading Ruby is to update the Gemfile version of <code class="highlighter-rouge">did_you_mean</code> to <code class="highlighter-rouge">0.10.0</code> if it wasn’t already. That version was released 4 months before Ruby 2.3, so some apps may already be using it. Version <code class="highlighter-rouge">0.10.0</code> works with both 2.3 and previous versions.</p>
+<p>A graceful method of upgrading Ruby is to update the Gemfile version of <code class="language-plaintext highlighter-rouge">did_you_mean</code> to <code class="language-plaintext highlighter-rouge">0.10.0</code> if it wasn’t already. That version was released 4 months before Ruby 2.3, so some apps may already be using it. Version <code class="language-plaintext highlighter-rouge">0.10.0</code> works with both 2.3 and previous versions.</p>
 
 <p>Fix came from <a href="https://github.com/yuki24/did_you_mean/issues/61">this Github issue</a></p>
 
@@ -273,16 +280,12 @@
 
 
   
-  
-  
 
   <p class="page__taxonomy">
     <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
     <span itemprop="keywords">
     
-      
-      
-      <a href="/tags/ruby" class="page__taxonomy-item" style="color: #fff; background-color: #CC342D;" rel="tag">ruby</a>
+      <a href="/tags/ruby" class="page__taxonomy-item" rel="tag">ruby</a>
     
     </span>
   </p>
@@ -291,19 +294,20 @@
 
 
         
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-03-04T00:00:00-07:00">March 04, 2016</time></p>
-        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-03-04T00:00:00-07:00">March 4, 2016</time></p>
+
+
       </footer>
 
       <section class="page__share">
   
 
   <a href="https://twitter.com/intent/tweet?text=Smoothly+upgrade+did_you_mean+gem+for+Ruby+2.3%20https%3A%2F%2Fwww.paulhoffer.com%2F2016%2F03%2F04%2Fsmoothly-upgrade-did-you-mean-gem-for-ruby-23.html" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
-  <a href="https://www.reddit.com/submit?url=https%3A%2F%2Fwww.paulhoffer.com%2F2016%2F03%2F04%2Fsmoothly-upgrade-did-you-mean-gem-for-ruby-23.html&title=Smoothly+upgrade+did_you_mean+gem+for+Ruby+2.3" class="btn btn--reddit" onclick="window.open(this.href, 'window', ''); return false;" title="Share on Reddit"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i><span> Reddit</span></a>
-  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.paulhoffer.com%2F2016%2F03%2F04%2Fsmoothly-upgrade-did-you-mean-gem-for-ruby-23.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
-  <a href="https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fwww.paulhoffer.com%2F2016%2F03%2F04%2Fsmoothly-upgrade-did-you-mean-gem-for-ruby-23.html&t=Smoothly+upgrade+did_you_mean+gem+for+Ruby+2.3" class="btn btn--hackernews" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Hacker News"><i class="fab fa-fw fa-hacker-news" aria-hidden="true"></i><span> Hacker News</span></a>
+
   <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.paulhoffer.com%2F2016%2F03%2F04%2Fsmoothly-upgrade-did-you-mean-gem-for-ruby-23.html" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
 
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.paulhoffer.com%2F2016%2F03%2F04%2Fsmoothly-upgrade-did-you-mean-gem-for-ruby-23.html" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 </section>
 
 
@@ -331,36 +335,45 @@
       <div class="grid__wrapper">
         
           
-          
 
 
 
 <div class="grid__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2019/04/16/case-insensitive-emails-and-usernames-with-postgres.html" rel="permalink">Case insensitive emails and usernames with Postgres
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  2 minute read
-</p>
+  <p class="page__meta">
     
-    <p class="archive__item-excerpt" itemprop="description">TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.
 
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          11 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">TLDR: Use case insensitive text (citext) in Postgres, and don’t worry about email/usernames in application code.
 </p>
   </article>
 </div>
 
         
-          
           
 
 
@@ -368,57 +381,78 @@
 <div class="grid__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2018/03/22/easy-session-testing-in-phoenix-and-plug.html" rel="permalink">Easy Session Testing in Phoenix and Plug
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  1 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          1 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">Many real world Phoenix applications use JWTs to handle authentication, but there are situations that still require being able to test session. This has trad...</p>
   </article>
 </div>
 
         
           
-          
 
 
 
 <div class="grid__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html" rel="permalink">Simple Setup of PostGIS Columns with Phoenix Generators
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  3 minute read
-</p>
+  <p class="page__meta">
     
-    <p class="archive__item-excerpt" itemprop="description">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.
 
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">How to use Phoenix generators with PostGIS column types, with minimal changes to get tests, changesets, and schema working.
 </p>
   </article>
 </div>
 
         
-          
           
 
 
@@ -426,21 +460,33 @@
 <div class="grid__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2016/09/21/force-git-to-treat-keynote-files-as-binary.html" rel="permalink">Force git to treat Keynote files as binary
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  less than 1 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">I was recently putting together a repo for presentations I’ve given, and I kept running into an annoying issue. Git would treat my Keynote files as a directo...</p>
   </article>
 </div>
@@ -449,23 +495,26 @@
       </div>
     </div>
   
+  
 </div>
 
     </div>
 
     
       <div class="search-content">
-        <div class="search-content__inner-wrap"><input type="search" id="search" aria-placeholder="Enter your search term..." class="search-input" tabindex="-1" placeholder="Enter your search term..." />
-    <div id="results" class="results"></div></div>
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
 
       </div>
     
 
     
-
-    
   <script src="/assets/js/main.min.js"></script>
-  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
 
 
 
@@ -473,23 +522,6 @@
 <script src="/assets/js/lunr/lunr.min.js"></script>
 <script src="/assets/js/lunr/lunr-store.js"></script>
 <script src="/assets/js/lunr/lunr-en.js"></script>
-
-
-
-
-  <script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-41717657-1']);
-  
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
-
 
 
 
