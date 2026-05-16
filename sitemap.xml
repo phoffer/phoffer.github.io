@@ -2,11 +2,11 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>https://www.paulhoffer.com/2016/02/20/getting-ghost-onto-github-pages.html</loc>
-<lastmod>2016-02-20T00:00:00-07:00</lastmod>
+<lastmod>2016-02-20T00:00:00-08:00</lastmod>
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2016/03/04/smoothly-upgrade-did-you-mean-gem-for-ruby-23.html</loc>
-<lastmod>2016-03-04T00:00:00-07:00</lastmod>
+<lastmod>2016-03-04T00:00:00-08:00</lastmod>
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2016/09/21/force-git-to-treat-keynote-files-as-binary.html</loc>
@@ -14,7 +14,7 @@
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2018/03/03/simple-setup-of-postgis-columns-with-phoenix-generators.html</loc>
-<lastmod>2018-03-03T00:00:00-07:00</lastmod>
+<lastmod>2018-03-03T00:00:00-08:00</lastmod>
 </url>
 <url>
 <loc>https://www.paulhoffer.com/2018/03/22/easy-session-testing-in-phoenix-and-plug.html</loc>

@@ -10,7 +10,7 @@
     <meta charset="utf-8">
 
 <!-- begin _includes/seo.html --><title>plug - Paul Hoffer</title>
-<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+<meta name="description" content="“Software developer usually working in Ruby, with some occasional distractions in Crystal. Focusing in performance, quality, and just generally making stuff better.">
 
 
   <meta name="author" content="Paul Hoffer">
@@ -24,7 +24,7 @@
 <meta property="og:url" content="https://www.paulhoffer.com/tags/plug/">
 
 
-  <meta property="og:description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+  <meta property="og:description" content="“Software developer usually working in Ruby, with some occasional distractions in Crystal. Focusing in performance, quality, and just generally making stuff better.">
 
 
 
@@ -42,16 +42,7 @@
 
 
 
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    
-      "@type": "Person",
-      "name": null,
-      "url": "https://www.paulhoffer.com/"
-    
-  }
-</script>
+
 
 
 
@@ -64,19 +55,17 @@
 
 
   <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Paul Hoffer Feed">
-
-
-<!-- https://t.co/dKP3o1e -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  
 </script>
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="/assets/css/main.css">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css"></noscript>
 
 
 
@@ -110,25 +99,23 @@
   
 
 
-<div itemscope itemtype="https://schema.org/Person">
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
 
   
     <div class="author__avatar">
-      
-        <a href="/">
-          <img src="/assets/img/bio.png" alt="Paul Hoffer" itemprop="image">
-        </a>
-      
+      <a href="https://www.paulhoffer.com/">
+        <img src="/assets/img/bio.png" alt="Paul Hoffer" itemprop="image" class="u-photo">
+      </a>
     </div>
   
 
   <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="https://www.paulhoffer.com/" itemprop="url">Paul Hoffer</a>
+    </h3>
     
-      <a href="/"><h3 class="author__name" itemprop="name">Paul Hoffer</h3></a>
-    
-    
-      <div class="author__bio" itemprop="description">
-        <p>Software developer bouncing between Ruby, Elixir, and Crystal. I like to tackle big problems and work on random projects.</p>
+      <div class="author__bio p-note" itemprop="description">
+        <p>Software engineer usually working in Ruby, with some occasional distractions in Crystal. Focusing in performance, quality, and just generally making stuff better.</p>
 
       </div>
     
@@ -152,12 +139,6 @@
       
 
       
-        <li>
-          <a href="https://www.linkedin.com/in/paulhoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
-            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span>
-          </a>
-        </li>
-      
 
       
 
@@ -169,7 +150,7 @@
 
       
         <li>
-          <a href="https://github.com/phoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
+          <a href="https://github.com/phoffer" itemprop="sameAs" rel="nofollow noopener noreferrer me">
             <i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span>
           </a>
         </li>
@@ -179,7 +160,7 @@
 
       
         <li>
-          <a href="https://stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs" rel="nofollow noopener noreferrer">
+          <a href="https://stackoverflow.com/users/366051/paul-hoffer" itemprop="sameAs" rel="nofollow noopener noreferrer me">
             <i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span>
           </a>
         </li>
@@ -209,7 +190,7 @@
 
       <!--
   <li>
-    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
       <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
@@ -274,7 +255,7 @@
 
     
       <div class="search-content">
-        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
     <label class="sr-only" for="search">
       Enter your search term...
     </label>
